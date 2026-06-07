@@ -10,6 +10,7 @@ import {
 import { getAstronomyPicture } from "../../services/nasaApi";
 import { Apod } from "../../types/apod";
 import { Colors } from "../../theme/colors";
+import { SpaceCard } from "../../components/SpaceCard";
 
 export function HomeScreen() {
   const [data, setData] = useState<Apod | null>(null);
@@ -92,39 +93,64 @@ export function HomeScreen() {
       />
 
       <View
-        style={{
-          padding: 20,
-        }}
-      >
-        <Text
-          style={{
-            fontSize: 28,
-            fontWeight: "bold",
-            color: Colors.text,
-            marginBottom: 8,
-          }}
-        >
-          {data?.title}
-        </Text>
+  style={{
+    padding: 20,
+  }}
+>
+  <Text
+    style={{
+      fontSize: 28,
+      fontWeight: "bold",
+      color: Colors.text,
+      marginBottom: 8,
+    }}
+  >
+    {data?.title}
+  </Text>
 
-        <Text
-          style={{
-            color: Colors.textSecondary,
-            marginBottom: 16,
-          }}
-        >
-          {data?.date}
-        </Text>
+  <Text
+    style={{
+      color: Colors.textSecondary,
+      marginBottom: 16,
+    }}
+  >
+    {data?.date}
+  </Text>
 
-        <Text
-          style={{
-            color: Colors.text,
-            lineHeight: 24,
-          }}
-        >
-          {data?.explanation}
-        </Text>
-      </View>
+  <Text
+    style={{
+      color: Colors.text,
+      lineHeight: 24,
+      marginBottom: 24,
+    }}
+  >
+    {data?.explanation}
+  </Text>
+
+  <SpaceCard
+    icon="🪐"
+    title="Explorar Universo"
+    onPress={() => {}}
+  />
+
+  <SpaceCard
+    icon="⭐"
+    title="Catálogo Estelar"
+    onPress={() => {}}
+  />
+
+  <SpaceCard
+    icon="🌌"
+    title="Galáxias"
+    onPress={() => {}}
+  />
+
+  <SpaceCard
+    icon="👽"
+    title="Arquivos Secretos"
+    onPress={() => {}}
+  />
+</View>
     </ScrollView>
   );
 }
