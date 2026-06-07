@@ -11,11 +11,13 @@ import { getAstronomyPicture } from "../../services/nasaApi";
 import { Apod } from "../../types/apod";
 import { Colors } from "../../theme/colors";
 import { SpaceCard } from "../../components/SpaceCard";
+import { useNavigation } from "@react-navigation/native";
 
 export function HomeScreen() {
   const [data, setData] = useState<Apod | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const navigation = useNavigation();
 
   async function loadData() {
     try {
@@ -146,9 +148,11 @@ export function HomeScreen() {
   />
 
   <SpaceCard
-    icon="👽"
-    title="Arquivos Secretos"
-    onPress={() => {}}
+    icon="🪐"
+    title="Explorar Universo"
+    onPress={() =>
+      navigation.navigate("Universo" as never)
+    }
   />
 </View>
     </ScrollView>

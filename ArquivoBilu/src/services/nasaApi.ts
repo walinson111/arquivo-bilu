@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_KEY = "DEMO_KEY";
+const API_KEY = "nvPbEZhLk0bLLEvMROsCYcAswJe9kMClxebqyrfW";
 
 export const nasaApi = axios.create({
   baseURL: "https://api.nasa.gov",
