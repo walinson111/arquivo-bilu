@@ -6,6 +6,7 @@ import { HomeScreen } from "../screens/Home/HomeScreen";
 import { ProfileScreen } from "../screens/Profile/ProfileScreen";
 import { UFOScreen } from "../screens/UFO/UFOScreen";
 import { UniverseNavigator } from "./UniverseNavigator";
+import { SolarSystemScreen } from "../screens/Universe/SolarSystemScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -21,7 +22,7 @@ export function AppNavigator() {
       <Tab.Screen name="Universo" component={UniverseNavigator} />
       <Tab.Screen name="Arquivos" component={UFOScreen} />
       <Tab.Screen name="Favoritos" component={FavoritesScreen} />
-      <Tab.Screen name="Perfil" component={ProfileScreen} />
+      <Tab.Screen name="Perfil" component={SolarSystemScreen} />
     </Tab.Navigator>
   );
 }
