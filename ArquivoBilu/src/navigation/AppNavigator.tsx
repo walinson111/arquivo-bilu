@@ -1,16 +1,22 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
-import { HomeScreen } from "../screens/Home/HomeScreen";
-import { UniverseNavigator } from "./UniverseNavigator";
-import { UFOScreen } from "../screens/UFO/UFOScreen";
+import { CustomTabBar } from "../components/Customtabbar";
 import { FavoritesScreen } from "../screens/Favorites/FavoritesScreen";
+import { HomeScreen } from "../screens/Home/HomeScreen";
 import { ProfileScreen } from "../screens/Profile/ProfileScreen";
+import { UFOScreen } from "../screens/UFO/UFOScreen";
+import { UniverseNavigator } from "./UniverseNavigator";
 
 const Tab = createBottomTabNavigator();
 
 export function AppNavigator() {
   return (
-    <Tab.Navigator>
+    <Tab.Navigator
+      tabBar={(props) => <CustomTabBar {...props} />}
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
       <Tab.Screen name="Início" component={HomeScreen} />
       <Tab.Screen name="Universo" component={UniverseNavigator} />
       <Tab.Screen name="Arquivos" component={UFOScreen} />
