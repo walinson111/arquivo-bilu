@@ -14,6 +14,7 @@ import { useCallback } from "react";
 import { View } from "react-native";
 
 import { AppNavigator } from "./src/navigation/AppNavigator";
+import { FavoritesProvider } from "./src/context/FavoritesContext";
 import { Colors } from "./src/theme/colors";
 
 // Mantém a splash screen visível enquanto as fontes carregam
@@ -41,9 +42,11 @@ export default function App() {
 
   return (
     <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
-      <NavigationContainer>
-        <AppNavigator />
-      </NavigationContainer>
+      <FavoritesProvider>
+        <NavigationContainer>
+          <AppNavigator />
+        </NavigationContainer>
+      </FavoritesProvider>
     </View>
   );
 }
