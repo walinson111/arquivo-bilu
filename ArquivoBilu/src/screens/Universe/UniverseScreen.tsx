@@ -32,12 +32,79 @@ function getPlanetVisual(id: string) {
   return PLANET_VISUALS[id.toLowerCase()] ?? { emoji: "🪐", accent: Colors.nebulaPurple, label: "Planeta" };
 }
 
+// ─── Card do Sistema Solar 3D ─────────────────────────────────────────────────
+
+function SolarSystemCard({ onPress }: { onPress: () => void }) {
+  const scaleAnim = useRef(new Animated.Value(0.96)).current;
+  const fadeAnim  = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, { toValue: 1, duration: 500, useNativeDriver: true }),
+      Animated.spring(scaleAnim, { toValue: 1, speed: 14, bounciness: 6, useNativeDriver: true }),
+    ]).start();
+  }, []);
+
+  return (
+    <Animated.View style={{ opacity: fadeAnim, transform: [{ scale: scaleAnim }] }}>
+      <Pressable
+        onPress={onPress}
+        style={({ pressed }) => [styles.solarCard, { opacity: pressed ? 0.88 : 1 }]}
+        android_ripple={{ color: Colors.cosmicBlue + "22" }}
+      >
+        {/* Fundo decorativo com planetas em miniatura */}
+        <View style={styles.solarCardBg} pointerEvents="none">
+          {["🪐", "🌍", "🔴", "🌊"].map((emoji, i) => (
+            <Text
+              key={i}
+              style={[
+                styles.bgEmoji,
+                { right: 12 + i * 30, top: 8 + (i % 2) * 14, opacity: 0.18 + i * 0.06, fontSize: 28 - i * 3 },
+              ]}
+            >
+              {emoji}
+            </Text>
+          ))}
+        </View>
+
+        <View style={styles.solarCardContent}>
+          {/* Ícone e badge */}
+          <View style={styles.solarCardLeft}>
+            <View style={styles.solarIconWrap}>
+              <Text style={styles.solarIcon}>🌌</Text>
+            </View>
+            <View style={styles.solarBadge}>
+              <Text style={styles.solarBadgeText}>3D</Text>
+            </View>
+          </View>
+
+          {/* Texto */}
+          <View style={styles.solarCardBody}>
+            <Text style={styles.solarTitle}>Sistema Solar</Text>
+            <Text style={styles.solarSub}>
+              Explore os planetas em visualização tridimensional interativa
+            </Text>
+          </View>
+
+          {/* Seta */}
+          <View style={styles.solarArrowWrap}>
+            <Ionicons name="chevron-forward" size={20} color={Colors.cosmicBlue} />
+          </View>
+        </View>
+
+        {/* Linha de brilho inferior */}
+        <View style={styles.solarGlowLine} />
+      </Pressable>
+    </Animated.View>
+  );
+}
+
 // ─── Card de planeta ──────────────────────────────────────────────────────────
 
 function PlanetCard({ item, index, onPress }: { item: any; index: number; onPress: () => void }) {
   const visual = getPlanetVisual(item.id);
   const slideAnim = useRef(new Animated.Value(40)).current;
-  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const fadeAnim  = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.parallel([
@@ -104,7 +171,7 @@ function PlanetCard({ item, index, onPress }: { item: any; index: number; onPres
 export function UniverseScreen() {
   const [planets, setPlanets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const [error, setError]     = useState(false);
   const navigation = useNavigation<any>();
 
   async function loadPlanets() {
@@ -113,7 +180,6 @@ export function UniverseScreen() {
       setError(false);
       const bodies = await getBodies();
       const onlyPlanets = bodies.filter((b: any) => b.isPlanet);
-      // Ordena pelo ID para garantir sequência do Sistema Solar
       const ORDER = ["mercury", "venus", "earth", "mars", "jupiter", "saturn", "uranus", "neptune"];
       onlyPlanets.sort((a: any, b: any) => {
         const ai = ORDER.indexOf(a.id.toLowerCase());
@@ -159,10 +225,25 @@ export function UniverseScreen() {
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={
-          <View style={styles.header}>
-            <Text style={styles.headerLabel}>SISTEMA SOLAR</Text>
-            <Text style={styles.headerTitle}>Universo</Text>
-            <Text style={styles.headerSub}>{planets.length} planetas mapeados</Text>
+          <View>
+            {/* Header */}
+            <View style={styles.header}>
+              <Text style={styles.headerLabel}>EXPLORADOR</Text>
+              <Text style={styles.headerTitle}>Universo</Text>
+              <Text style={styles.headerSub}>{planets.length} planetas mapeados</Text>
+            </View>
+
+            {/* Card Sistema Solar 3D */}
+            <SolarSystemCard
+              onPress={() => navigation.navigate("SolarSystem")}
+            />
+
+            {/* Divisor de seção */}
+            <View style={styles.sectionDivider}>
+              <View style={styles.dividerLine} />
+              <Text style={styles.dividerText}>PLANETAS</Text>
+              <View style={styles.dividerLine} />
+            </View>
           </View>
         }
         renderItem={({ item, index }) => (
@@ -196,7 +277,7 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: 20,
     paddingTop: 60,
-    paddingBottom: 20,
+    paddingBottom: 16,
   },
   headerLabel: {
     fontFamily: Fonts.orbitron,
@@ -218,13 +299,118 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
   },
 
+  // ─ Card Sistema Solar ─
+  solarCard: {
+    marginHorizontal: 16,
+    marginBottom: 6,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: Colors.cosmicBlue + "40",
+    backgroundColor: "rgba(14, 28, 54, 0.70)",
+    overflow: "hidden",
+  },
+  solarCardBg: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  bgEmoji: {
+    position: "absolute",
+  },
+  solarCardContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 16,
+    gap: 14,
+  },
+  solarCardLeft: {
+    alignItems: "center",
+    gap: 6,
+  },
+  solarIconWrap: {
+    width: 56,
+    height: 56,
+    borderRadius: 16,
+    backgroundColor: Colors.cosmicBlue + "18",
+    borderWidth: 1,
+    borderColor: Colors.cosmicBlue + "35",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  solarIcon: {
+    fontSize: 28,
+  },
+  solarBadge: {
+    backgroundColor: Colors.cosmicBlue + "20",
+    borderWidth: 1,
+    borderColor: Colors.cosmicBlue + "55",
+    borderRadius: 100,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+  },
+  solarBadgeText: {
+    fontFamily: Fonts.orbitron,
+    fontSize: 8,
+    color: Colors.cosmicBlue,
+    letterSpacing: 1.5,
+  },
+  solarCardBody: {
+    flex: 1,
+    gap: 4,
+  },
+  solarTitle: {
+    fontFamily: Fonts.orbitronBlack,
+    fontSize: 16,
+    color: Colors.text,
+    letterSpacing: 0.5,
+  },
+  solarSub: {
+    fontFamily: Fonts.spaceGrotesk,
+    fontSize: 12,
+    color: Colors.textSecondary,
+    lineHeight: 18,
+  },
+  solarArrowWrap: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    backgroundColor: Colors.cosmicBlue + "15",
+    borderWidth: 1,
+    borderColor: Colors.cosmicBlue + "30",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  solarGlowLine: {
+    height: 1,
+    backgroundColor: Colors.cosmicBlue,
+    opacity: 0.18,
+  },
+
+  // ─ Divisor ─
+  sectionDivider: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginHorizontal: 16,
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: "rgba(255,255,255,0.07)",
+  },
+  dividerText: {
+    fontFamily: Fonts.orbitron,
+    fontSize: 9,
+    color: Colors.textSecondary,
+    letterSpacing: 2,
+  },
+
   // Lista
   list: {
-    paddingHorizontal: 16,
     paddingBottom: 32,
   },
 
-  // Card
+  // Card planeta
   card: {
     flexDirection: "row",
     alignItems: "center",
@@ -234,6 +420,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 14,
     marginBottom: 10,
+    marginHorizontal: 16,
   },
   cardLeft: {
     flexShrink: 0,
