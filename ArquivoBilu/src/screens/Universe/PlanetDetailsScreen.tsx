@@ -5,6 +5,10 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Colors } from "../../theme/colors";
 import { Fonts } from "../../theme/fonts";
+import { Canvas, useFrame, useLoader } from "@react-three/fiber/native";
+import { useRef } from "react";
+import { TextureLoader, THREE } from "expo-three";
+import { Asset } from "expo-asset";
 
 // ─── Dados visuais ────────────────────────────────────────────────────────────
 
@@ -42,7 +46,42 @@ function StatCard({ label, value, unit, accent }: { label: string; value: string
   );
 }
 
-// ─── Tela ─────────────────────────────────────────────────────────────────────
+// ─── Componente de Preview 3D ─────────────────────────────────────────────────
+
+function PlanetPreview({ planetId }: { planetId: string }) {
+  const meshRef = useRef<THREE.Mesh>(null);
+
+  const textureMap: Record<string, number> = {
+    mercury: require("../../../assets/textures/mercury.jpg"),
+    venus: require("../../../assets/textures/venus.jpg"),
+    earth: require("../../../assets/textures/earth.jpg"),
+    mars: require("../../../assets/textures/mars.jpg"),
+    jupiter: require("../../../assets/textures/jupiter.jpg"),
+    saturn: require("../../../assets/textures/saturn.jpg"),
+    uranus: require("../../../assets/textures/uranus.jpg"),
+    neptune: require("../../../assets/textures/neptune.jpg"),
+  };
+
+  const texture = useLoader(
+    TextureLoader,
+    Asset.fromModule(textureMap[planetId] || textureMap.earth).uri
+  ) as THREE.Texture;
+
+  useFrame(() => {
+    if (meshRef.current) {
+      meshRef.current.rotation.y += 0.01;
+    }
+  });
+
+  return (
+    <mesh ref={meshRef}>
+      <sphereGeometry args={[1, 48, 48]} />
+      <meshStandardMaterial map={texture} />
+    </mesh>
+  );
+}
+
+// ─── Tela Principal ───────────────────────────────────────────────────────────
 
 export function PlanetDetailsScreen({ route }: any) {
   const { planet } = route.params;
@@ -69,52 +108,56 @@ export function PlanetDetailsScreen({ route }: any) {
 
         {/* Hero do planeta */}
         <View style={styles.heroSection}>
-          <View style={[styles.emojiCircle, { backgroundColor: visual.accent + "18", borderColor: visual.accent + "33" }]}>
-            <Text style={styles.heroEmoji}>{visual.emoji}</Text>
+          <View style={[styles.planetGlow, { backgroundColor: visual.accent }]} />
+
+          <View style={[styles.planetViewer, { borderColor: visual.accent + "44" }]}>
+            <Canvas camera={{ position: [0, 0, 3] }}>
+              <ambientLight intensity={2} />
+              <pointLight position={[5, 5, 5]} intensity={10} />
+              <PlanetPreview planetId={planet.id} />
+            </Canvas>
           </View>
 
           <View style={[styles.typeBadge, { backgroundColor: visual.accent + "1A", borderColor: visual.accent + "44" }]}>
-            <Text style={[styles.typeBadgeText, { color: visual.accent }]}>{visual.label}</Text>
+            <Text style={[styles.typeBadgeText, { color: visual.accent }]}>
+              {visual.label}
+            </Text>
           </View>
 
-          <Text style={styles.planetName}>{planet.englishName}</Text>
-          <Text style={styles.planetDescription}>{visual.description}</Text>
+          <Text style={styles.planetName}>
+            {planet.name || planet.englishName}
+          </Text>
+
+          <Text style={styles.planetDescription}>
+            {visual.description}
+          </Text>
         </View>
 
-        {/* Grid de estatísticas */}
-        <Text style={[styles.sectionTitle, { color: visual.accent }]}>✦ DADOS DO PLANETA</Text>
-
+        {/* ─── NOVA SEÇÃO: Métricas Principais (Stats Grid) ─── */}
+        <Text style={[styles.sectionTitle, { color: visual.accent }]}>CARACTERÍSTICAS</Text>
         <View style={styles.statsGrid}>
           <StatCard label="Gravidade" value={planet.gravity} unit="m/s²" accent={visual.accent} />
           <StatCard label="Densidade" value={planet.density} unit="g/cm³" accent={visual.accent} />
-          <StatCard label="Massa (exp)" value={planet.mass?.massExponent ?? "—"} unit="kg" accent={visual.accent} />
-          <StatCard label="Vol. (exp)" value={planet.vol?.volExponent ?? "—"} unit="km³" accent={visual.accent} />
-          <StatCard label="Inclinação axial" value={planet.axialTilt?.toFixed(1) ?? "—"} unit="°" accent={visual.accent} />
-          <StatCard label="Período orbital" value={planet.sideralOrbit?.toFixed(0) ?? "—"} unit="dias" accent={visual.accent} />
+          <StatCard label="Raio Médio" value={planet.meanRadius} unit="km" accent={visual.accent} />
         </View>
 
-        {/* Informações extras */}
-        {(planet.discoveredBy || planet.discoveryDate) && (
-          <>
-            <Text style={[styles.sectionTitle, { color: visual.accent }]}>✦ DESCOBERTA</Text>
-            <View style={[styles.infoCard, { borderColor: visual.accent + "22" }]}>
-              {planet.discoveredBy && (
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>Descoberto por</Text>
-                  <Text style={[styles.infoValue, { color: visual.accent }]}>{planet.discoveredBy}</Text>
-                </View>
-              )}
-              {planet.discoveryDate && (
-                <View style={[styles.infoRow, { borderTopWidth: 1, borderTopColor: "rgba(255,255,255,0.05)" }]}>
-                  <Text style={styles.infoLabel}>Data</Text>
-                  <Text style={[styles.infoValue, { color: visual.accent }]}>{planet.discoveryDate}</Text>
-                </View>
-              )}
-            </View>
-          </>
-        )}
+        {/* ─── NOVA SEÇÃO: Informações Adicionais (Info Card) ─── */}
+        <Text style={[styles.sectionTitle, { color: visual.accent }]}>DETALHES ORBITAIS</Text>
+        <View style={[styles.infoCard, { borderColor: visual.accent + "25" }]}>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Período Orbital</Text>
+            <Text style={[styles.infoValue, { color: Colors.text }]}>{planet.sideralOrbit ?? "—"} dias</Text>
+          </View>
+          <View style={[styles.infoRow, { borderTopWidth: 1, borderTopColor: "rgba(255,255,255,0.05)" }]}>
+            <Text style={styles.infoLabel}>Período de Rotação</Text>
+            <Text style={[styles.infoValue, { color: Colors.text }]}>{planet.sideralRotation ?? "—"} horas</Text>
+          </View>
+          <View style={[styles.infoRow, { borderTopWidth: 1, borderTopColor: "rgba(255,255,255,0.05)" }]}>
+            <Text style={styles.infoLabel}>Luas Conhecidas</Text>
+            <Text style={[styles.infoValue, { color: Colors.text }]}>{planet.moons ? planet.moons.length : 0}</Text>
+          </View>
+        </View>
 
-        <View style={{ height: 32 }} />
       </ScrollView>
     </View>
   );
@@ -131,8 +174,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 40,
   },
-
-  // Header
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -155,24 +196,11 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     letterSpacing: 2,
   },
-
-  // Hero
   heroSection: {
     alignItems: "center",
     paddingVertical: 28,
     gap: 12,
-  },
-  emojiCircle: {
-    width: 110,
-    height: 110,
-    borderRadius: 55,
-    borderWidth: 1.5,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 4,
-  },
-  heroEmoji: {
-    fontSize: 54,
+    position: "relative",
   },
   typeBadge: {
     paddingHorizontal: 14,
@@ -198,27 +226,24 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     textAlign: "center",
     lineHeight: 22,
+    marginBottom: 10,
   },
-
-  // Seção
   sectionTitle: {
     fontFamily: Fonts.orbitron,
     fontSize: 10,
     letterSpacing: 2.5,
     marginBottom: 12,
-    marginTop: 4,
+    marginTop: 16,
   },
-
-  // Grid de stats
   statsGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 10,
-    marginBottom: 24,
+    marginBottom: 14,
   },
   statCard: {
     flex: 1,
-    minWidth: "30%",
+    minWidth: "28%",
     backgroundColor: "rgba(30, 41, 59, 0.55)",
     borderRadius: 14,
     borderWidth: 1,
@@ -227,12 +252,12 @@ const styles = StyleSheet.create({
   },
   statValue: {
     fontFamily: Fonts.orbitron,
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "700",
   },
   statUnit: {
     fontFamily: Fonts.spaceGrotesk,
-    fontSize: 11,
+    fontSize: 10,
     color: Colors.textSecondary,
   },
   statLabel: {
@@ -240,8 +265,6 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: Colors.textSecondary,
   },
-
-  // Info card
   infoCard: {
     backgroundColor: "rgba(30, 41, 59, 0.55)",
     borderRadius: 14,
@@ -263,5 +286,23 @@ const styles = StyleSheet.create({
   infoValue: {
     fontFamily: Fonts.spaceGroteskBold,
     fontSize: 13,
+  },
+  planetViewer: {
+    width: 220,
+    height: 220,
+    borderRadius: 110,
+    overflow: "hidden",
+    borderWidth: 1.5,
+    alignSelf: "center",
+    backgroundColor: "rgba(255,255,255,0.02)",
+  },
+  planetGlow: {
+    position: "absolute",
+    top: 35,
+    width: 180,
+    height: 180,
+    borderRadius: 90,
+    opacity: 0.22,
+    transform: [{ scale: 1.4 }],
   },
 });
