@@ -5,11 +5,10 @@ import { Colors } from "../theme/colors";
 import { Fonts } from "../theme/fonts";
 import { PlanetDetailsScreen } from "../screens/Universe/PlanetDetailsScreen";
 import { SolarSystemScreen } from "../screens/Universe/SolarSystemScreen";
+import { StarDetailsScreen } from "../screens/Universe/StarDetailsScreen";
 import { UniverseScreen } from "../screens/Universe/UniverseScreen";
 
 const Stack = createNativeStackNavigator();
-
-// ─── Header customizado com toggle Lista / 3D ─────────────────────────────────
 
 function UniverseHeader({ navigation, route }: any) {
   const is3D = route.name === "SolarSystem";
@@ -31,6 +30,8 @@ function UniverseHeader({ navigation, route }: any) {
     </View>
   );
 }
+
+const DETAIL_SCREENS = ["PlanetDetails", "StarDetails"];
 
 const header = StyleSheet.create({
   wrap: {
@@ -65,8 +66,6 @@ const header = StyleSheet.create({
   },
 });
 
-// ─── Navigator ────────────────────────────────────────────────────────────────
-
 export function UniverseNavigator() {
   return (
     <Stack.Navigator
@@ -75,9 +74,8 @@ export function UniverseNavigator() {
         headerTintColor: Colors.text,
         headerTitleStyle: { fontFamily: Fonts.orbitron, fontSize: 14, letterSpacing: 1 },
         headerShadowVisible: false,
-        // Injeta o toggle Lista/3D em baixo do título nas telas principais
         headerBottom: () =>
-          route.name !== "PlanetDetails" ? (
+          !DETAIL_SCREENS.includes(route.name) ? (
             <UniverseHeader navigation={navigation} route={route} />
           ) : null,
       })}
@@ -95,6 +93,11 @@ export function UniverseNavigator() {
       <Stack.Screen
         name="PlanetDetails"
         component={PlanetDetailsScreen}
+        options={{ title: "", headerShown: true }}
+      />
+      <Stack.Screen
+        name="StarDetails"
+        component={StarDetailsScreen}
         options={{ title: "", headerShown: true }}
       />
     </Stack.Navigator>
