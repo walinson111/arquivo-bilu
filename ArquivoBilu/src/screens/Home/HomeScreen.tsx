@@ -19,61 +19,9 @@ import { getAstronomyPicture } from "../../services/nasaApi";
 import { Colors } from "../../theme/colors";
 import { Fonts } from "../../theme/fonts";
 import type { Apod } from "../../types/apod";
+import { FEATURED_HOME as FEATURED, TRENDING_HOME as TRENDING } from "../../constants/homeData";
 
 const { width: SCREEN_W } = Dimensions.get("window");
-
-// ─── Objetos que existem no app ───────────────────────────────────────────────
-
-const FEATURED = [
-  {
-    id: "mars", kind: "planet", label: "PLANETA", name: "Marte",
-    subtitle: "O Planeta Vermelho",
-    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/OSIRIS_Mars_true_color.jpg/800px-OSIRIS_Mars_true_color.jpg",
-    accent: "#EF4444", badge: "Terrestre",
-    screen: "PlanetDetails",
-    params: { planet: { id: "mars", englishName: "Mars", isPlanet: true, bodyType: "planet", gravity: 3.721, density: 3.933, meanRadius: 3389.5, sideralOrbit: 686.971, sideralRotation: 24.6229, moons: [{ moon: "Phobos" }, { moon: "Deimos" }] } },
-  },
-  {
-    id: "saturn", kind: "planet", label: "PLANETA", name: "Saturno",
-    subtitle: "O Senhor dos Anéis",
-    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Saturn_during_Equinox.jpg/800px-Saturn_during_Equinox.jpg",
-    accent: "#D4A017", badge: "Gasoso",
-    screen: "PlanetDetails",
-    params: { planet: { id: "saturn", englishName: "Saturn", isPlanet: true, bodyType: "planet", gravity: 10.44, density: 0.687, meanRadius: 58232.0, sideralOrbit: 10759.22, sideralRotation: 10.656, moons: [{ moon: "Titan" }] } },
-  },
-  {
-    id: "sirius", kind: "star", label: "ESTRELA", name: "Sírius",
-    subtitle: "A mais brilhante do céu",
-    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Sirius_A_and_B_Hubble_photo.jpg/800px-Sirius_A_and_B_Hubble_photo.jpg",
-    accent: "#93C5FD", badge: "Anã Azul",
-    screen: "StarDetails",
-    params: { star: { id: "sirius", name: "Sírius", constellation: "Canis Major", spectralType: "A1V", starClass: "Anã Branca-Azul", distanceLy: 8.6, luminosity: 25.4, mass: 2.02, radius: 1.711, surfaceTemp: 9940, absoluteMag: 1.43, age: 0.242, emoji: "💠", accent: "#93C5FD", description: "A estrela mais brilhante do céu noturno.", curiosity: "Sírius B é uma anã branca do tamanho da Terra, porém com a massa do Sol." } },
-  },
-  {
-    id: "betelgeuse", kind: "star", label: "ESTRELA", name: "Betelgeuse",
-    subtitle: "Supergigante de Órion",
-    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/ESO-Betelgeuse.jpg/800px-ESO-Betelgeuse.jpg",
-    accent: "#F87171", badge: "Supergigante",
-    screen: "StarDetails",
-    params: { star: { id: "betelgeuse", name: "Betelgeuse", constellation: "Orion", spectralType: "M2Ia", starClass: "Supergigante Vermelha", distanceLy: 700, luminosity: 126000, mass: 16.5, radius: 764, surfaceTemp: 3500, absoluteMag: -5.85, age: 0.008, emoji: "🔴", accent: "#F87171", description: "Uma das maiores estrelas conhecidas, marcando o ombro de Órion.", curiosity: "Se Betelgeuse estivesse no lugar do Sol, ela englobaria toda a órbita de Júpiter." } },
-  },
-  {
-    id: "jupiter", kind: "planet", label: "PLANETA", name: "Júpiter",
-    subtitle: "O Gigante Gasoso",
-    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Jupiter_and_its_shrunken_Great_Red_Spot.jpg/800px-Jupiter_and_its_shrunken_Great_Red_Spot.jpg",
-    accent: "#FB923C", badge: "Gasoso",
-    screen: "PlanetDetails",
-    params: { planet: { id: "jupiter", englishName: "Jupiter", isPlanet: true, bodyType: "planet", gravity: 24.79, density: 1.326, meanRadius: 69911.0, sideralOrbit: 4332.589, sideralRotation: 9.9259, moons: [{ moon: "Io" }, { moon: "Europa" }] } },
-  },
-];
-
-const TRENDING = [
-  { id: "earth",   name: "Terra",         type: "Planeta",  emoji: "🌍", accent: "#22C55E", screen: "PlanetDetails", params: { planet: { id: "earth", englishName: "Earth", isPlanet: true, bodyType: "planet", gravity: 9.807, density: 5.514, meanRadius: 6371.0, sideralOrbit: 365.256, sideralRotation: 23.9345, moons: [{ moon: "Moon" }] } } },
-  { id: "neptune", name: "Netuno",        type: "Planeta",  emoji: "🌊", accent: "#6366F1", screen: "PlanetDetails", params: { planet: { id: "neptune", englishName: "Neptune", isPlanet: true, bodyType: "planet", gravity: 11.15, density: 1.638, meanRadius: 24622.0, sideralOrbit: 60182.0, sideralRotation: 16.11, moons: [{ moon: "Triton" }] } } },
-  { id: "polaris", name: "Polaris",       type: "Estrela",  emoji: "🌟", accent: "#FDE68A", screen: "StarDetails",   params: { star: { id: "polaris", name: "Polaris", constellation: "Ursa Minor", spectralType: "F7Ib", starClass: "Supergigante Amarela", distanceLy: 433, luminosity: 2500, mass: 5.4, radius: 46, surfaceTemp: 6015, absoluteMag: -3.64, age: 0.07, emoji: "🌟", accent: "#FDE68A", description: "A estrela Polar, guia de navegadores por séculos.", curiosity: "Polaris é na verdade um sistema triplo — Polaris A, Ab e B." } } },
-  { id: "pluto",   name: "Plutão",        type: "P. Anão",  emoji: "🩵", accent: "#93C5FD", screen: "PlanetDetails", params: { planet: { id: "pluto", englishName: "Pluto", isPlanet: false, bodyType: "dwarf_planet", gravity: 0.62, density: 1.854, meanRadius: 1188.3, sideralOrbit: 90560.0, sideralRotation: -153.3, moons: [{ moon: "Charon" }] } } },
-  { id: "halley",  name: "Cometa Halley", type: "Cometa",   emoji: "☄️", accent: "#67E8F9", screen: "PlanetDetails", params: { planet: { id: "halley", englishName: "Halley's Comet", isPlanet: false, bodyType: "comet", gravity: null, density: 0.6, meanRadius: 5.5, sideralOrbit: 27507.0, sideralRotation: 170.4, moons: null } } },
-];
 
 // ─── Campo de estrelas ────────────────────────────────────────────────────────
 
