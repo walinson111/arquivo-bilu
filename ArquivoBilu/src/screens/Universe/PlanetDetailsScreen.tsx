@@ -9,6 +9,9 @@ import { Canvas, useFrame, useLoader } from "@react-three/fiber/native";
 import { useRef } from "react";
 import { TextureLoader, THREE } from "expo-three";
 import { Asset } from "expo-asset";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { UniverseStackParamList } from "../../navigation/UniverseNavigator";
+
 
 // ─── Dados visuais ────────────────────────────────────────────────────────────
 
@@ -81,13 +84,33 @@ function PlanetPreview({ planetId }: { planetId: string }) {
   );
 }
 
+const EARTH_RADIUS = 6371;
+
+type NavigationProp =
+  NativeStackNavigationProp<
+    UniverseStackParamList,
+    "PlanetDetails"
+  >;
+
+function getEarthComparison(radius: number) {
+  const ratio = radius / EARTH_RADIUS;
+
+  const volumeRatio = Math.pow(ratio, 3);
+
+  return {
+    radiusRatio: ratio.toFixed(2),
+    volumeRatio: volumeRatio.toFixed(0),
+  };
+}
+
 // ─── Tela Principal ───────────────────────────────────────────────────────────
 
 export function PlanetDetailsScreen({ route }: any) {
   const { planet } = route.params;
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp>();
   const insets = useSafeAreaInsets();
   const visual = getPlanetVisual(planet.id);
+  const comparison = getEarthComparison(planet.meanRadius);
 
   return (
     <View style={[styles.root, { paddingTop: insets.top }]}>
@@ -157,6 +180,43 @@ export function PlanetDetailsScreen({ route }: any) {
             <Text style={[styles.infoValue, { color: Colors.text }]}>{planet.moons ? planet.moons.length : 0}</Text>
           </View>
         </View>
+        
+        <Text
+  style={[
+    styles.sectionTitle,
+    { color: "#22C55E" }
+  ]}
+>
+  COMPARAÇÃO COM A TERRA
+</Text>
+
+<View style={styles.compareCard}>
+  <Text style={styles.compareTitle}>
+    🌍 Terra vs {planet.name}
+  </Text>
+
+  <Text style={styles.compareText}>
+    {comparison.radiusRatio}x o raio da Terra
+  </Text>
+
+  <Text style={styles.compareText}>
+    {comparison.volumeRatio} Terras caberiam dentro dele
+  </Text>
+
+  <TouchableOpacity
+    style={styles.compareButton}
+    onPress={() =>
+      navigation.navigate(
+        "PlanetComparison",
+        { planet }
+      )
+    }
+  >
+    <Text style={styles.compareButtonText}>
+      Ver em 3D
+    </Text>
+  </TouchableOpacity>
+</View>
 
       </ScrollView>
     </View>
@@ -305,4 +365,39 @@ const styles = StyleSheet.create({
     opacity: 0.22,
     transform: [{ scale: 1.4 }],
   },
+
+  compareCard: {
+  backgroundColor: "rgba(30,41,59,0.55)",
+  borderRadius: 16,
+  padding: 18,
+  marginBottom: 30,
+  borderWidth: 1,
+  borderColor: "rgba(255,255,255,0.08)",
+},
+
+compareTitle: {
+  color: Colors.text,
+  fontSize: 16,
+  marginBottom: 10,
+  fontFamily: Fonts.orbitron,
+},
+
+compareText: {
+  color: Colors.textSecondary,
+  marginBottom: 8,
+  fontFamily: Fonts.spaceGrotesk,
+},
+
+compareButton: {
+  marginTop: 12,
+  backgroundColor: "#22C55E",
+  paddingVertical: 12,
+  borderRadius: 12,
+  alignItems: "center",
+},
+
+compareButtonText: {
+  color: "#000",
+  fontFamily: Fonts.spaceGroteskBold,
+},
 });

@@ -7,8 +7,28 @@ import { PlanetDetailsScreen } from "../screens/Universe/PlanetDetailsScreen";
 import { SolarSystemScreen } from "../screens/Universe/SolarSystemScreen";
 import { StarDetailsScreen } from "../screens/Universe/StarDetailsScreen";
 import { UniverseScreen } from "../screens/Universe/UniverseScreen";
+import { PlanetComparisonScreen } from "../screens/Universe/PlanetComparisonScreen";
 
-const Stack = createNativeStackNavigator();
+export type UniverseStackParamList = {
+  UniverseList: undefined;
+
+  SolarSystem: undefined;
+
+  PlanetDetails: {
+    planet: any;
+  };
+
+  PlanetComparison: {
+    planet: any;
+  };
+
+  StarDetails: {
+    star: any;
+  };
+};
+
+const Stack =
+  createNativeStackNavigator<UniverseStackParamList>();
 
 function UniverseHeader({ navigation, route }: any) {
   const is3D = route.name === "SolarSystem";
@@ -99,6 +119,11 @@ export function UniverseNavigator() {
         name="StarDetails"
         component={StarDetailsScreen}
         options={{ title: "", headerShown: true }}
+      />
+      <Stack.Screen
+        name="PlanetComparison"
+        component={PlanetComparisonScreen}
+        options={{ title: "Comparação", headerShown: true }}
       />
     </Stack.Navigator>
   );
