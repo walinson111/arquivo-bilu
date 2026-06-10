@@ -16,8 +16,8 @@ import { View } from "react-native";
 import { AppNavigator } from "./src/navigation/AppNavigator";
 import { FavoritesProvider } from "./src/context/FavoritesContext";
 import { Colors } from "./src/theme/colors";
+import { navigationRef } from "./src/navigation/navigationRef";
 
-// Mantém a splash screen visível enquanto as fontes carregam
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
@@ -30,12 +30,9 @@ export default function App() {
   });
 
   const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
-    }
+    if (fontsLoaded) await SplashScreen.hideAsync();
   }, [fontsLoaded]);
 
-  // Enquanto as fontes não carregam, mostra fundo escuro
   if (!fontsLoaded) {
     return <View style={{ flex: 1, backgroundColor: Colors.background }} />;
   }
@@ -43,7 +40,8 @@ export default function App() {
   return (
     <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
       <FavoritesProvider>
-        <NavigationContainer>
+        {/* ref aqui garante que navigationRef funciona de qualquer tela */}
+        <NavigationContainer ref={navigationRef}>
           <AppNavigator />
         </NavigationContainer>
       </FavoritesProvider>
