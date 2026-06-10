@@ -1,5 +1,5 @@
-import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -9,9 +9,10 @@ import { Canvas, useFrame, useLoader } from "@react-three/fiber/native";
 import { useRef } from "react";
 import { TextureLoader, THREE } from "expo-three";
 import { Asset } from "expo-asset";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { UniverseStackParamList } from "../../navigation/UniverseNavigator";
+import { PLANET_TEXTURES } from "../../constants/textures";
+import type { PlanetDetailsProps, UniverseStackParamList } from "../../navigation/types";
 
+type NavProp = NativeStackNavigationProp<UniverseStackParamList, "PlanetDetails">;
 
 // ─── Dados visuais ────────────────────────────────────────────────────────────
 
@@ -37,106 +38,83 @@ function getPlanetVisual(id: string) {
 
 // ─── Componente de estatística ────────────────────────────────────────────────
 
-function StatCard({ label, value, unit, accent }: { label: string; value: string | number; unit?: string; accent: string }) {
+function StatCard({ label, value, unit, accent }: {
+  label: string;
+  value: number | null;
+  unit?: string;
+  accent: string;
+}) {
   return (
     <View style={[styles.statCard, { borderColor: accent + "25" }]}>
       <Text style={[styles.statValue, { color: accent }]}>
         {value ?? "—"}
-        {unit && <Text style={styles.statUnit}> {unit}</Text>}
+        {value != null && unit && <Text style={styles.statUnit}> {unit}</Text>}
       </Text>
       <Text style={styles.statLabel}>{label}</Text>
     </View>
   );
 }
 
-// ─── Componente de Preview 3D ─────────────────────────────────────────────────
+// ─── Preview 3D ───────────────────────────────────────────────────────────────
 
 function PlanetPreview({ planetId }: { planetId: string }) {
   const meshRef = useRef<THREE.Mesh>(null);
 
-  const textureMap: Record<string, number> = {
-    mercury: require("../../../assets/textures/mercury.jpg"),
-    venus: require("../../../assets/textures/venus.jpg"),
-    earth: require("../../../assets/textures/earth.jpg"),
-    mars: require("../../../assets/textures/mars.jpg"),
-    jupiter: require("../../../assets/textures/jupiter.jpg"),
-    saturn: require("../../../assets/textures/saturn.jpg"),
-    uranus: require("../../../assets/textures/uranus.jpg"),
-    neptune: require("../../../assets/textures/neptune.jpg"),
-  };
-
+  const texturePath = PLANET_TEXTURES[planetId] ?? PLANET_TEXTURES.earth;
   const texture = useLoader(
     TextureLoader,
-    Asset.fromModule(textureMap[planetId] || textureMap.earth).uri
+    Asset.fromModule(texturePath).uri
   ) as THREE.Texture;
 
   useFrame(() => {
-    if (meshRef.current) {
-      meshRef.current.rotation.y += 0.01;
-    }
+    if (meshRef.current) meshRef.current.rotation.y += 0.01;
   });
 
   return (
     <mesh ref={meshRef}>
-      <sphereGeometry args={[1, 48, 48]} />
+      <sphereGeometry args={[1, 48, 48] as [number, number, number]} />
       <meshStandardMaterial map={texture} />
     </mesh>
   );
 }
 
-const EARTH_RADIUS = 6371;
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
-type NavigationProp =
-  NativeStackNavigationProp<
-    UniverseStackParamList,
-    "PlanetDetails"
-  >;
+const EARTH_RADIUS = 6371;
 
 function getEarthComparison(radius: number) {
   const ratio = radius / EARTH_RADIUS;
-
-  const volumeRatio = Math.pow(ratio, 3);
-
   return {
     radiusRatio: ratio.toFixed(2),
-    volumeRatio: volumeRatio.toFixed(0),
+    volumeRatio: Math.pow(ratio, 3).toFixed(0),
   };
 }
 
 // ─── Tela Principal ───────────────────────────────────────────────────────────
 
-export function PlanetDetailsScreen({ route }: any) {
+export function PlanetDetailsScreen({ route }: PlanetDetailsProps) {
   const { planet } = route.params;
-  const navigation = useNavigation<NavigationProp>();
+  const navigation = useNavigation<NavProp>();
   const insets = useSafeAreaInsets();
   const visual = getPlanetVisual(planet.id);
-  const comparison = getEarthComparison(planet.meanRadius);
+  const comparison = planet.meanRadius != null
+    ? getEarthComparison(planet.meanRadius)
+    : null;
+
+  const displayName = planet.englishName;
 
   return (
     <View style={[styles.root, { paddingTop: insets.top }]}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
-
-        {/* Cabeçalho com botão voltar */}
-        <View style={styles.header}>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.backBtn}
-            activeOpacity={0.75}
-          >
-            <Ionicons name="arrow-back" size={20} color={Colors.text} />
-          </TouchableOpacity>
-          <Text style={styles.headerLabel}>SISTEMA SOLAR</Text>
-          <View style={{ width: 40 }} />
-        </View>
 
         {/* Hero do planeta */}
         <View style={styles.heroSection}>
           <View style={[styles.planetGlow, { backgroundColor: visual.accent }]} />
 
           <View style={[styles.planetViewer, { borderColor: visual.accent + "44" }]}>
-            <Canvas camera={{ position: [0, 0, 3] }}>
+            <Canvas camera={{ position: [0, 0, 3] as [number, number, number] }}>
               <ambientLight intensity={2} />
-              <pointLight position={[5, 5, 5]} intensity={10} />
+              <pointLight position={[5, 5, 5] as [number, number, number]} intensity={10} />
               <PlanetPreview planetId={planet.id} />
             </Canvas>
           </View>
@@ -147,76 +125,60 @@ export function PlanetDetailsScreen({ route }: any) {
             </Text>
           </View>
 
-          <Text style={styles.planetName}>
-            {planet.name || planet.englishName}
-          </Text>
-
-          <Text style={styles.planetDescription}>
-            {visual.description}
-          </Text>
+          <Text style={styles.planetName}>{displayName}</Text>
+          <Text style={styles.planetDescription}>{visual.description}</Text>
         </View>
 
-        {/* ─── NOVA SEÇÃO: Métricas Principais (Stats Grid) ─── */}
+        {/* Características */}
         <Text style={[styles.sectionTitle, { color: visual.accent }]}>CARACTERÍSTICAS</Text>
         <View style={styles.statsGrid}>
-          <StatCard label="Gravidade" value={planet.gravity} unit="m/s²" accent={visual.accent} />
-          <StatCard label="Densidade" value={planet.density} unit="g/cm³" accent={visual.accent} />
-          <StatCard label="Raio Médio" value={planet.meanRadius} unit="km" accent={visual.accent} />
+          <StatCard label="Gravidade"  value={planet.gravity}    unit="m/s²"  accent={visual.accent} />
+          <StatCard label="Densidade"  value={planet.density}    unit="g/cm³" accent={visual.accent} />
+          <StatCard label="Raio Médio" value={planet.meanRadius} unit="km"    accent={visual.accent} />
         </View>
 
-        {/* ─── NOVA SEÇÃO: Informações Adicionais (Info Card) ─── */}
+        {/* Detalhes orbitais */}
         <Text style={[styles.sectionTitle, { color: visual.accent }]}>DETALHES ORBITAIS</Text>
         <View style={[styles.infoCard, { borderColor: visual.accent + "25" }]}>
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Período Orbital</Text>
-            <Text style={[styles.infoValue, { color: Colors.text }]}>{planet.sideralOrbit ?? "—"} dias</Text>
+            <Text style={[styles.infoValue, { color: Colors.text }]}>
+              {planet.sideralOrbit ?? "—"} dias
+            </Text>
           </View>
           <View style={[styles.infoRow, { borderTopWidth: 1, borderTopColor: "rgba(255,255,255,0.05)" }]}>
             <Text style={styles.infoLabel}>Período de Rotação</Text>
-            <Text style={[styles.infoValue, { color: Colors.text }]}>{planet.sideralRotation ?? "—"} horas</Text>
+            <Text style={[styles.infoValue, { color: Colors.text }]}>
+              {planet.sideralRotation ?? "—"} horas
+            </Text>
           </View>
           <View style={[styles.infoRow, { borderTopWidth: 1, borderTopColor: "rgba(255,255,255,0.05)" }]}>
             <Text style={styles.infoLabel}>Luas Conhecidas</Text>
-            <Text style={[styles.infoValue, { color: Colors.text }]}>{planet.moons ? planet.moons.length : 0}</Text>
+            <Text style={[styles.infoValue, { color: Colors.text }]}>
+              {planet.moons?.length ?? 0}
+            </Text>
           </View>
         </View>
-        
-        <Text
-  style={[
-    styles.sectionTitle,
-    { color: "#22C55E" }
-  ]}
->
-  COMPARAÇÃO COM A TERRA
-</Text>
 
-<View style={styles.compareCard}>
-  <Text style={styles.compareTitle}>
-    🌍 Terra vs {planet.name}
-  </Text>
-
-  <Text style={styles.compareText}>
-    {comparison.radiusRatio}x o raio da Terra
-  </Text>
-
-  <Text style={styles.compareText}>
-    {comparison.volumeRatio} Terras caberiam dentro dele
-  </Text>
-
-  <TouchableOpacity
-    style={styles.compareButton}
-    onPress={() =>
-      navigation.navigate(
-        "PlanetComparison",
-        { planet }
-      )
-    }
-  >
-    <Text style={styles.compareButtonText}>
-      Ver em 3D
-    </Text>
-  </TouchableOpacity>
-</View>
+        {/* Comparação com a Terra */}
+        {comparison && (
+          <>
+            <Text style={[styles.sectionTitle, { color: "#22C55E" }]}>COMPARAÇÃO COM A TERRA</Text>
+            <View style={styles.compareCard}>
+              <Text style={styles.compareTitle}>🌍 Terra vs {displayName}</Text>
+              <Text style={styles.compareText}>{comparison.radiusRatio}x o raio da Terra</Text>
+              <Text style={styles.compareText}>{comparison.volumeRatio} Terras caberiam dentro dele</Text>
+              <TouchableOpacity
+                style={styles.compareButton}
+                activeOpacity={0.8}
+                accessibilityLabel="Ver comparação 3D com a Terra"
+                onPress={() => navigation.navigate("PlanetComparison", { planet })}
+              >
+                <Text style={styles.compareButtonText}>Ver em 3D</Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        )}
 
       </ScrollView>
     </View>
@@ -226,36 +188,9 @@ export function PlanetDetailsScreen({ route }: any) {
 // ─── Estilos ──────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  scroll: {
-    paddingHorizontal: 20,
-    paddingBottom: 40,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingVertical: 12,
-  },
-  backBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: "rgba(255,255,255,0.07)",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.1)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  headerLabel: {
-    fontFamily: Fonts.orbitron,
-    fontSize: 10,
-    color: Colors.textSecondary,
-    letterSpacing: 2,
-  },
+  root:   { flex: 1, backgroundColor: Colors.background },
+  scroll: { paddingHorizontal: 20, paddingBottom: 40 },
+
   heroSection: {
     alignItems: "center",
     paddingVertical: 28,
@@ -365,39 +300,34 @@ const styles = StyleSheet.create({
     opacity: 0.22,
     transform: [{ scale: 1.4 }],
   },
-
   compareCard: {
-  backgroundColor: "rgba(30,41,59,0.55)",
-  borderRadius: 16,
-  padding: 18,
-  marginBottom: 30,
-  borderWidth: 1,
-  borderColor: "rgba(255,255,255,0.08)",
-},
-
-compareTitle: {
-  color: Colors.text,
-  fontSize: 16,
-  marginBottom: 10,
-  fontFamily: Fonts.orbitron,
-},
-
-compareText: {
-  color: Colors.textSecondary,
-  marginBottom: 8,
-  fontFamily: Fonts.spaceGrotesk,
-},
-
-compareButton: {
-  marginTop: 12,
-  backgroundColor: "#22C55E",
-  paddingVertical: 12,
-  borderRadius: 12,
-  alignItems: "center",
-},
-
-compareButtonText: {
-  color: "#000",
-  fontFamily: Fonts.spaceGroteskBold,
-},
+    backgroundColor: "rgba(30,41,59,0.55)",
+    borderRadius: 16,
+    padding: 18,
+    marginBottom: 30,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.08)",
+  },
+  compareTitle: {
+    color: Colors.text,
+    fontSize: 16,
+    marginBottom: 10,
+    fontFamily: Fonts.orbitron,
+  },
+  compareText: {
+    color: Colors.textSecondary,
+    marginBottom: 8,
+    fontFamily: Fonts.spaceGrotesk,
+  },
+  compareButton: {
+    marginTop: 12,
+    backgroundColor: "#22C55E",
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  compareButtonText: {
+    color: "#000",
+    fontFamily: Fonts.spaceGroteskBold,
+  },
 });
