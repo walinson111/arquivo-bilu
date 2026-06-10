@@ -1,27 +1,63 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import { CustomTabBar } from "../components/Customtabbar";
 import { FavoritesScreen } from "../screens/Favorites/FavoritesScreen";
 import { HomeScreen } from "../screens/Home/HomeScreen";
 import { ProfileScreen } from "../screens/Profile/ProfileScreen";
-import { UniverseNavigator } from "./UniverseNavigator";
+import { PlanetDetailsScreen } from "../screens/Universe/PlanetDetailsScreen";
+import { StarDetailsScreen } from "../screens/Universe/StarDetailsScreen";
 import { UFONavigator } from "./UFONavigator";
+import { UniverseNavigator } from "./UniverseNavigator";
+import { Colors } from "../theme/colors";
+import { Fonts } from "../theme/fonts";
 
-const Tab = createBottomTabNavigator();
+const Tab   = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
 
-export function AppNavigator() {
+function TabNavigator() {
   return (
     <Tab.Navigator
       tabBar={(props) => <CustomTabBar {...props} />}
-      screenOptions={{
-        headerShown: false,
-      }}
+      screenOptions={{ headerShown: false }}
     >
       <Tab.Screen name="Início"    component={HomeScreen} />
       <Tab.Screen name="Universo"  component={UniverseNavigator} />
-      <Tab.Screen name="Arquivos" component={UFONavigator} />
+      <Tab.Screen name="Arquivos"  component={UFONavigator} />
       <Tab.Screen name="Favoritos" component={FavoritesScreen} />
       <Tab.Screen name="Perfil"    component={ProfileScreen} />
     </Tab.Navigator>
+  );
+}
+
+export function AppNavigator() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Tabs" component={TabNavigator} />
+      <Stack.Screen
+        name="PlanetDetails"
+        component={PlanetDetailsScreen}
+        options={{
+          headerShown: true,
+          title: "",
+          headerStyle: { backgroundColor: Colors.background },
+          headerTintColor: Colors.text,
+          headerShadowVisible: false,
+          headerTitleStyle: { fontFamily: Fonts.orbitron },
+        }}
+      />
+      <Stack.Screen
+        name="StarDetails"
+        component={StarDetailsScreen}
+        options={{
+          headerShown: true,
+          title: "",
+          headerStyle: { backgroundColor: Colors.background },
+          headerTintColor: Colors.text,
+          headerShadowVisible: false,
+          headerTitleStyle: { fontFamily: Fonts.orbitron },
+        }}
+      />
+    </Stack.Navigator>
   );
 }
