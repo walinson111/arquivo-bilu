@@ -35,7 +35,7 @@ export interface Star {
 
 // ─── Planetas ─────────────────────────────────────────────────────────────────
 
-const SOLAR_SYSTEM_BODIES: CelestialBody[] = [
+export const SOLAR_SYSTEM_BODIES: CelestialBody[] = [
   {
     id: "mercury", englishName: "Mercury", isPlanet: true, bodyType: "planet",
     gravity: 3.7, density: 5.427, meanRadius: 2439.7,
