@@ -103,6 +103,38 @@ function SolarSystemCard({ onPress }: { onPress: () => void }) {
   );
 }
 
+// ---- Card Comparação Planetas --------
+function ComparisonCard({ onPress }: { onPress: () => void }) {
+  return (
+    <Pressable
+      onPress={onPress}
+      style={styles.solarCard}
+    >
+      <View style={styles.solarCardContent}>
+        <View style={styles.solarIconWrap}>
+          <Text style={styles.solarIcon}>🆚</Text>
+        </View>
+
+        <View style={styles.solarCardBody}>
+          <Text style={styles.solarTitle}>
+            Comparador
+          </Text>
+
+          <Text style={styles.solarSub}>
+            Compare tamanho, gravidade e escala em 3D
+          </Text>
+        </View>
+
+        <Ionicons
+          name="chevron-forward"
+          size={20}
+          color={Colors.cosmicBlue}
+        />
+      </View>
+    </Pressable>
+  );
+}
+
 // ─── Card de corpo celeste ────────────────────────────────────────────────────
 
 function BodyCard({ item, index, onPress }: { item: CelestialBody; index: number; onPress: () => void }) {
@@ -299,12 +331,14 @@ export function UniverseScreen() {
 
   type ListItem =
     | { kind: "solar_card" }
+    | { kind: "comparison_card" }
     | { kind: "divider"; label: string; count: number; emoji: string }
     | { kind: "body"; data: CelestialBody; index: number }
     | { kind: "star"; data: Star; index: number };
 
   const listData: ListItem[] = [
     { kind: "solar_card" },
+    { kind: "comparison_card" },
     { kind: "divider", label: "PLANETAS",        count: planets.length,   emoji: "🪐" },
     ...planets.map((p, i)   => ({ kind: "body" as const, data: p, index: i })),
     { kind: "divider", label: "PLANETAS-ANÕES",  count: dwarfs.length,    emoji: "🔮" },
@@ -339,6 +373,9 @@ export function UniverseScreen() {
         renderItem={({ item }) => {
           if (item.kind === "solar_card") {
             return <SolarSystemCard onPress={() => navigation.navigate("SolarSystem")} />;
+          }
+          if (item.kind === "comparison_card") {
+            return <ComparisonCard onPress={() => navigation.navigate("PlanetSelector")} />;
           }
           if (item.kind === "divider") {
             return <SectionDivider label={item.label} count={item.count} emoji={item.emoji} />;
