@@ -1,6 +1,4 @@
-import { useNavigation } from "@react-navigation/native";
-import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Colors } from "../../theme/colors";
@@ -10,11 +8,9 @@ import { useRef } from "react";
 import { TextureLoader, THREE } from "expo-three";
 import { Asset } from "expo-asset";
 import { PLANET_TEXTURES } from "../../constants/textures";
-import type { PlanetDetailsProps, UniverseStackParamList } from "../../navigation/types";
+import type { PlanetDetailsProps } from "../../navigation/types";
 import { useFavoritesContext } from "../../context/FavoritesContext";
-import { SOLAR_SYSTEM_BODIES } from "../../services/solarSystemApi";
 
-type NavProp = NativeStackNavigationProp<UniverseStackParamList, "PlanetDetails">;
 
 // ─── Dados visuais ────────────────────────────────────────────────────────────
 
@@ -82,31 +78,12 @@ function PlanetPreview({ planetId }: { planetId: string }) {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const EARTH_RADIUS = 6371;
-
-function getEarthComparison(radius: number) {
-  const ratio = radius / EARTH_RADIUS;
-  return {
-    radiusRatio: ratio.toFixed(2),
-    volumeRatio: Math.pow(ratio, 3).toFixed(0),
-  };
-}
-
 // ─── Tela Principal ───────────────────────────────────────────────────────────
 
 export function PlanetDetailsScreen({ route }: PlanetDetailsProps) {
-  // Se o planeta veio com dados incompletos (ex: da tela Sistema Solar 3D),
-  // busca o objeto completo nos dados estáticos.
-  const rawPlanet = route.params.planet;
-  const planet = (rawPlanet.gravity == null && rawPlanet.density == null)
-    ? (SOLAR_SYSTEM_BODIES.find((b) => b.id === rawPlanet.id) ?? rawPlanet)
-    : rawPlanet;
-  const navigation = useNavigation<NavProp>();
+  const { planet } = route.params;
   const insets = useSafeAreaInsets();
   const visual = getPlanetVisual(planet.id);
-  const comparison = planet.meanRadius != null
-    ? getEarthComparison(planet.meanRadius)
-    : null;
 
   const { isFavorite, toggleFavorite } = useFavoritesContext();
   const favorited = isFavorite(planet.id);
@@ -186,25 +163,6 @@ export function PlanetDetailsScreen({ route }: PlanetDetailsProps) {
           </View>
         </View>
 
-        {/* Comparação com a Terra */}
-        {comparison && (
-          <>
-            <Text style={[styles.sectionTitle, { color: "#22C55E" }]}>COMPARAÇÃO COM A TERRA</Text>
-            <View style={styles.compareCard}>
-              <Text style={styles.compareTitle}>🌍 Terra vs {displayName}</Text>
-              <Text style={styles.compareText}>{comparison.radiusRatio}x o raio da Terra</Text>
-              <Text style={styles.compareText}>{comparison.volumeRatio} Terras caberiam dentro dele</Text>
-              <TouchableOpacity
-                style={styles.compareButton}
-                activeOpacity={0.8}
-                accessibilityLabel="Ver comparação 3D com a Terra"
-                onPress={() => navigation.navigate("PlanetComparison", { planet })}
-              >
-                <Text style={styles.compareButtonText}>Ver em 3D</Text>
-              </TouchableOpacity>
-            </View>
-          </>
-        )}
 
       </ScrollView>
     </View>
@@ -325,36 +283,6 @@ const styles = StyleSheet.create({
     borderRadius: 90,
     opacity: 0.22,
     transform: [{ scale: 1.4 }],
-  },
-  compareCard: {
-    backgroundColor: "rgba(30,41,59,0.55)",
-    borderRadius: 16,
-    padding: 18,
-    marginBottom: 30,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.08)",
-  },
-  compareTitle: {
-    color: Colors.text,
-    fontSize: 16,
-    marginBottom: 10,
-    fontFamily: Fonts.orbitron,
-  },
-  compareText: {
-    color: Colors.textSecondary,
-    marginBottom: 8,
-    fontFamily: Fonts.spaceGrotesk,
-  },
-  compareButton: {
-    marginTop: 12,
-    backgroundColor: "#22C55E",
-    paddingVertical: 12,
-    borderRadius: 12,
-    alignItems: "center",
-  },
-  compareButtonText: {
-    color: "#000",
-    fontFamily: Fonts.spaceGroteskBold,
   },
   favBtn: {
     position: "absolute",
