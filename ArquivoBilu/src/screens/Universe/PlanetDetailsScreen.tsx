@@ -1,6 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Colors } from "../../theme/colors";
@@ -11,6 +11,7 @@ import { TextureLoader, THREE } from "expo-three";
 import { Asset } from "expo-asset";
 import { PLANET_TEXTURES } from "../../constants/textures";
 import type { PlanetDetailsProps, UniverseStackParamList } from "../../navigation/types";
+import { useFavoritesContext } from "../../context/FavoritesContext";
 
 type NavProp = NativeStackNavigationProp<UniverseStackParamList, "PlanetDetails">;
 
@@ -101,10 +102,29 @@ export function PlanetDetailsScreen({ route }: PlanetDetailsProps) {
     ? getEarthComparison(planet.meanRadius)
     : null;
 
+  const { isFavorite, toggleFavorite } = useFavoritesContext();
+  const favorited = isFavorite(planet.id);
+
   const displayName = planet.englishName;
 
   return (
     <View style={[styles.root, { paddingTop: insets.top }]}>
+      {/* Botão favoritar flutuante */}
+      <Pressable
+        onPress={() => toggleFavorite({
+          id: planet.id,
+          name: displayName,
+          type: "planet",
+          emoji: visual.emoji,
+          accent: visual.accent,
+          subtitle: visual.label,
+          savedAt: Date.now(),
+        })}
+        style={[styles.favBtn, { borderColor: favorited ? visual.accent + "88" : "rgba(255,255,255,0.15)" }]}
+        accessibilityLabel={favorited ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+      >
+        <Text style={{ fontSize: 22 }}>{favorited ? "♥" : "♡"}</Text>
+      </Pressable>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
 
         {/* Hero do planeta */}
@@ -329,5 +349,18 @@ const styles = StyleSheet.create({
   compareButtonText: {
     color: "#000",
     fontFamily: Fonts.spaceGroteskBold,
+  },
+  favBtn: {
+    position: "absolute",
+    top: 16,
+    right: 16,
+    zIndex: 10,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "rgba(2,6,23,0.75)",
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

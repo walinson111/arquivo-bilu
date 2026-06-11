@@ -1,12 +1,13 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useRef } from "react";
-import { Animated, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Animated, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Colors } from "../../theme/colors";
 import { Fonts } from "../../theme/fonts";
 import type { Star } from "../../services/solarSystemApi";
+import { useFavoritesContext } from "../../context/FavoritesContext";
 
 // ─── Stat Card ────────────────────────────────────────────────────────────────
 
@@ -130,6 +131,8 @@ export function StarDetailsScreen({ route }: any) {
   const { star }: { star: Star } = route.params;
   const navigation = useNavigation();
   const insets     = useSafeAreaInsets();
+  const { isFavorite, toggleFavorite } = useFavoritesContext();
+  const favorited = isFavorite(star.id);
 
   const distanceDisplay =
     star.distanceLy < 1
@@ -140,6 +143,22 @@ export function StarDetailsScreen({ route }: any) {
 
   return (
     <View style={[styles.root, { paddingTop: insets.top }]}>
+      {/* Botão favoritar */}
+      <Pressable
+        onPress={() => toggleFavorite({
+          id: star.id,
+          name: star.name,
+          type: "star",
+          emoji: star.emoji,
+          accent: star.accent,
+          subtitle: star.starClass,
+          savedAt: Date.now(),
+        })}
+        style={[styles.favBtn, { borderColor: favorited ? star.accent + "88" : "rgba(255,255,255,0.15)" }]}
+        accessibilityLabel={favorited ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+      >
+        <Text style={{ fontSize: 22 }}>{favorited ? "♥" : "♡"}</Text>
+      </Pressable>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
 
         {/* Cabeçalho */}
@@ -302,4 +321,19 @@ const styles = StyleSheet.create({
   infoRow:  { flexDirection: "row", justifyContent: "space-between", alignItems: "center", padding: 14 },
   infoLabel:{ fontFamily: Fonts.spaceGrotesk, fontSize: 13, color: Colors.textSecondary },
   infoValue:{ fontFamily: Fonts.spaceGroteskBold, fontSize: 13, color: Colors.text },
+
+  // Favoritar
+  favBtn: {
+    position: "absolute",
+    top: 16,
+    right: 16,
+    zIndex: 10,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "rgba(2,6,23,0.75)",
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });
