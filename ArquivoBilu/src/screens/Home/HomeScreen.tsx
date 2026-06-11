@@ -53,10 +53,13 @@ function StarField() {
 // ─── Cards ────────────────────────────────────────────────────────────────────
 
 function FeaturedCard({ item, onPress }: { item: typeof FEATURED[0]; onPress: () => void }) {
+  const bodyImage = getBodyImage(item.id);
+  const imageSource = bodyImage ?? { uri: item.image };
+
   return (
     <Pressable onPress={onPress} style={({ pressed }) => [styles.featuredCard, { borderColor: item.accent + "33", opacity: pressed ? 0.85 : 1 }]}>
       <View style={styles.featuredImgWrap}>
-        <Image source={{ uri: item.image }} style={styles.featuredImg} resizeMode="cover" />
+        <Image source={imageSource} style={styles.featuredImg} resizeMode="cover" />
         <LinearGradient colors={["transparent", "rgba(2,6,23,0.92)"]} style={StyleSheet.absoluteFillObject} locations={[0.35, 1]} />
         <View style={[styles.featuredBadge, { backgroundColor: item.accent + "22", borderColor: item.accent + "55" }]}>
           <Text style={[styles.featuredBadgeText, { color: item.accent }]}>{item.badge}</Text>
@@ -306,8 +309,8 @@ const styles = StyleSheet.create({
 
   card:        { marginHorizontal: 16, backgroundColor: "rgba(30,41,59,0.55)", borderRadius: 16, borderWidth: 1, overflow: "hidden" },
   trendRow:    { flexDirection: "row", alignItems: "center", gap: 12, padding: 13 },
-  trendIcon:   { width: 40, height: 40, borderRadius: 12, borderWidth: 1, alignItems: "center", justifyContent: "center" },
-  trendImage:  { width: 40, height: 40, borderRadius: 12 },
+  trendIcon:   { width: 40, height: 40, borderRadius: 20, borderWidth: 1, alignItems: "center", justifyContent: "center" },
+  trendImage:  { width: 40, height: 40, borderRadius: 20 },
   trendEmoji:  { fontSize: 18 },
   trendText:   { flex: 1, gap: 2 },
   trendName:   { fontFamily: Fonts.spaceGroteskBold, color: Colors.text, fontSize: 14 },
