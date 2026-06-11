@@ -13,7 +13,7 @@ const LOCAL_PLANETS: Record<string, number> = {
 };
 
 const LOCAL_DWARFS: Record<string, number> = {
-  pluto: require("../../assets/textures/earth.jpg"),
+  pluto: require("../../assets/bodies/pluto.jpg"),
   eris:     require("../../assets/bodies/eris.jpg"),
   makemake: require("../../assets/bodies/makemake.jpg"),
   haumea:   require("../../assets/bodies/haumea.jpg"),
