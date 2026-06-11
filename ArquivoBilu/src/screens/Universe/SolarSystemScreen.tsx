@@ -281,7 +281,7 @@ function TestPlanet() {
 }
 // ─── Sol ──────────────────────────────────────────────────────────────────────
 
-function SunMesh() {
+function SunMesh({ paused }: { paused: boolean }) {
   const meshRef = useRef<THREE.Mesh>(null);
   const texture = useLoader(
     TextureLoader,
@@ -289,6 +289,7 @@ function SunMesh() {
   ) as THREE.Texture;
 
   useFrame(() => {
+    if (paused) return;
     if (meshRef.current) meshRef.current.rotation.y += 0.002;
   });
 
@@ -307,7 +308,7 @@ function SunMesh() {
   );
 }
 
-function Sun() {
+function Sun({ paused }: { paused: boolean }) {
   return (
     <Suspense fallback={
       <mesh>
@@ -315,7 +316,7 @@ function Sun() {
         <meshStandardMaterial color="#FDB813" emissive="#F97316" emissiveIntensity={1.2} roughness={1} metalness={0} />
       </mesh>
     }>
-      <SunMesh />
+      <SunMesh paused={paused} />
     </Suspense>
   );
 }
@@ -391,7 +392,7 @@ function SolarScene({
 
       <StarField />
 
-      <Sun />
+      <Sun paused={paused} />
 
       {PLANET_DATA.map((p) => (
         <OrbitRing
@@ -693,7 +694,3 @@ const styles = StyleSheet.create({
     padding: 4,
   },
 });
-
-function setTexPlanet(createdTexture: THREE.Texture<unknown, THREE.TextureEventMap>) {
-  throw new Error("Function not implemented.");
-}
