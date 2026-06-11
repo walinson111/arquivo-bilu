@@ -12,6 +12,7 @@ import { Asset } from "expo-asset";
 import { PLANET_TEXTURES } from "../../constants/textures";
 import type { PlanetDetailsProps, UniverseStackParamList } from "../../navigation/types";
 import { useFavoritesContext } from "../../context/FavoritesContext";
+import { SOLAR_SYSTEM_BODIES } from "../../services/solarSystemApi";
 
 type NavProp = NativeStackNavigationProp<UniverseStackParamList, "PlanetDetails">;
 
@@ -94,7 +95,12 @@ function getEarthComparison(radius: number) {
 // ─── Tela Principal ───────────────────────────────────────────────────────────
 
 export function PlanetDetailsScreen({ route }: PlanetDetailsProps) {
-  const { planet } = route.params;
+  // Se o planeta veio com dados incompletos (ex: da tela Sistema Solar 3D),
+  // busca o objeto completo nos dados estáticos.
+  const rawPlanet = route.params.planet;
+  const planet = (rawPlanet.gravity == null && rawPlanet.density == null)
+    ? (SOLAR_SYSTEM_BODIES.find((b) => b.id === rawPlanet.id) ?? rawPlanet)
+    : rawPlanet;
   const navigation = useNavigation<NavProp>();
   const insets = useSafeAreaInsets();
   const visual = getPlanetVisual(planet.id);

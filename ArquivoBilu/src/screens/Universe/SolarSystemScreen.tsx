@@ -4,6 +4,7 @@ import { Asset } from "expo-asset";
 import { useEffect, useRef, useState, Suspense } from "react";
 import {
   Animated,
+  Image,
   PanResponder,
   Platform,
   Pressable,
@@ -17,6 +18,8 @@ import { Colors } from "../../theme/colors";
 import { Fonts } from "../../theme/fonts";
 import { useLoader } from "@react-three/fiber/native";
 import { TextureLoader } from "expo-three";
+import { SOLAR_SYSTEM_BODIES } from "../../services/solarSystemApi";
+import { getBodyImage } from "../../constants/bodyImages";
 
 
 // ─── Dados dos planetas ───────────────────────────────────────────────────────
@@ -205,7 +208,7 @@ function Planet({
 }: {
   data: typeof PLANET_DATA[0];
   paused: boolean;
-  onPress: (name: string, accent: string, emoji: string) => void;
+  onPress: (id: string, name: string, accent: string, emoji: string) => void;
 }) {
   const meshRef = useRef<THREE.Mesh>(null);
   const groupRef = useRef<THREE.Group>(null);
@@ -241,7 +244,7 @@ function Planet({
       <mesh
         ref={meshRef}
         onPointerDown={() =>
-          onPress(data.name, data.accent, data.emoji)
+          onPress(data.id, data.name, data.accent, data.emoji)
         }
       >
         <sphereGeometry args={[data.radius, 48, 48]} />
@@ -281,7 +284,7 @@ function TestPlanet() {
 }
 // ─── Sol ──────────────────────────────────────────────────────────────────────
 
-function SunMesh({ paused }: { paused: boolean }) {
+function SunMesh() {
   const meshRef = useRef<THREE.Mesh>(null);
   const texture = useLoader(
     TextureLoader,
@@ -289,7 +292,6 @@ function SunMesh({ paused }: { paused: boolean }) {
   ) as THREE.Texture;
 
   useFrame(() => {
-    if (paused) return;
     if (meshRef.current) meshRef.current.rotation.y += 0.002;
   });
 
@@ -308,7 +310,7 @@ function SunMesh({ paused }: { paused: boolean }) {
   );
 }
 
-function Sun({ paused }: { paused: boolean }) {
+function Sun() {
   return (
     <Suspense fallback={
       <mesh>
@@ -316,7 +318,7 @@ function Sun({ paused }: { paused: boolean }) {
         <meshStandardMaterial color="#FDB813" emissive="#F97316" emissiveIntensity={1.2} roughness={1} metalness={0} />
       </mesh>
     }>
-      <SunMesh paused={paused} />
+      <SunMesh />
     </Suspense>
   );
 }
@@ -370,7 +372,7 @@ function SolarScene({
   theta: number;
   zoom: number;
   paused: boolean;
-  onPlanetPress: (name: string, accent: string, emoji: string) => void;
+  onPlanetPress: (id: string, name: string, accent: string, emoji: string) => void;
 }) {
   return (
     <>
@@ -392,7 +394,7 @@ function SolarScene({
 
       <StarField />
 
-      <Sun paused={paused} />
+      <Sun />
 
       {PLANET_DATA.map((p) => (
         <OrbitRing
@@ -419,16 +421,19 @@ function PlanetTooltip({
   name,
   accent,
   emoji,
+  planetId,
   onDetails,
   onClose,
 }: {
   name: string;
   accent: string;
   emoji: string;
+  planetId: string;
   onDetails: () => void;
   onClose: () => void;
 }) {
   const anim = useRef(new Animated.Value(0)).current;
+  const bodyImage = getBodyImage(planetId);
 
   useEffect(() => {
     Animated.spring(anim, { toValue: 1, useNativeDriver: true, speed: 16, bounciness: 8 }).start();
@@ -441,7 +446,13 @@ function PlanetTooltip({
         { borderColor: accent + "55", transform: [{ scale: anim }], opacity: anim },
       ]}
     >
-      <Text style={styles.tooltipEmoji}>{emoji}</Text>
+      <View style={[styles.tooltipImgWrap, { borderColor: accent + "44", backgroundColor: accent + "18" }]}>
+        {bodyImage ? (
+          <Image source={bodyImage} style={styles.tooltipImg} resizeMode="cover" />
+        ) : (
+          <Text style={styles.tooltipEmoji}>{emoji}</Text>
+        )}
+      </View>
       <View style={{ flex: 1 }}>
         <Text style={[styles.tooltipName, { color: accent }]}>{name}</Text>
         <Text style={styles.tooltipHint}>Toque para ver detalhes</Text>
@@ -471,7 +482,7 @@ export function SolarSystemScreen() {
   const lastTouch = useRef({ x: 0, y: 0 });
   const lastPinchDist = useRef<number | null>(null);
   const [paused, setPaused] = useState(false);
-  const [selected, setSelected] = useState<{ name: string; accent: string; emoji: string } | null>(null);
+  const [selected, setSelected] = useState<{ id: string; name: string; accent: string; emoji: string } | null>(null);
 
   const panResponder = useRef(
     PanResponder.create({
@@ -517,8 +528,8 @@ export function SolarSystemScreen() {
     })
   ).current;
 
-  function handlePlanetPress(name: string, accent: string, emoji: string) {
-    setSelected({ name, accent, emoji });
+  function handlePlanetPress(id: string, name: string, accent: string, emoji: string) {
+    setSelected({ id, name, accent, emoji });
     setPaused(true);
   }
 
@@ -529,21 +540,11 @@ export function SolarSystemScreen() {
 
   function handleGoToDetails() {
     if (!selected) return;
-    const planetData = PLANET_DATA.find((p) => p.name === selected.name);
+    const fullPlanet = SOLAR_SYSTEM_BODIES.find((p) => p.id === selected.id);
+    if (!fullPlanet) return;
     navigation.navigate("Universo", {
       screen: "PlanetDetails",
-      params: {
-        planet: {
-          id: planetData?.id ?? "",
-          englishName: selected.name,
-          gravity: null,
-          density: null,
-          mass: null,
-          vol: null,
-          axialTilt: null,
-          sideralOrbit: null,
-        },
-      },
+      params: { planet: fullPlanet },
     });
     handleCloseTooltip();
   }
@@ -591,6 +592,7 @@ return (
           name={selected.name}
           accent={selected.accent}
           emoji={selected.emoji}
+          planetId={selected.id}
           onDetails={handleGoToDetails}
           onClose={handleCloseTooltip}
         />
@@ -668,6 +670,21 @@ const styles = StyleSheet.create({
   tooltipEmoji: {
     fontSize: 32,
   },
+  tooltipImgWrap: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
+    flexShrink: 0,
+  },
+  tooltipImg: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+  },
   tooltipName: {
     fontFamily: Fonts.orbitron,
     fontSize: 16,
@@ -694,3 +711,7 @@ const styles = StyleSheet.create({
     padding: 4,
   },
 });
+
+function setTexPlanet(createdTexture: THREE.Texture<unknown, THREE.TextureEventMap>) {
+  throw new Error("Function not implemented.");
+}
