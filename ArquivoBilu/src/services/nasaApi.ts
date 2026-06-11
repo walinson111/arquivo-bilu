@@ -3,7 +3,7 @@ import axios from "axios";
 // A chave fica em .env (EXPO_PUBLIC_NASA_API_KEY).
 // Variáveis com prefixo EXPO_PUBLIC_ são injetadas em build time pelo Expo.
 // Nunca coloque a chave diretamente no código.
-const API_KEY = process.env.EXPO_PUBLIC_NASA_API_KEY ?? "DEMO_KEY";
+const API_KEY = process.env.EXPO_PUBLIC_NASA_API_KEY ?? "nvPbEZhLk0bLLEvMROsCYcAswJe9kMClxebqyrfW";
 
 export const nasaApi = axios.create({
   baseURL: "https://api.nasa.gov",
