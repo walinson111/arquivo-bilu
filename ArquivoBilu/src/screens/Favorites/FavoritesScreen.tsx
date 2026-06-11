@@ -4,6 +4,7 @@ import {
   Alert,
   Animated,
   FlatList,
+  Image,
   Pressable,
   StyleSheet,
   Text,
@@ -15,6 +16,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Colors } from "../../theme/colors";
 import { Fonts } from "../../theme/fonts";
 import { useFavoritesContext, FavoriteItem } from "../../context/FavoritesContext";
+import { getBodyImage } from "../../constants/bodyImages";
 
 // ─── Filtros ──────────────────────────────────────────────────────────────────
 
@@ -51,6 +53,7 @@ function EmptyState({ filtered }: { filtered: boolean }) {
 
 function FavoriteCard({ item, onRemove }: { item: FavoriteItem; onRemove: () => void }) {
   const scaleAnim = useRef(new Animated.Value(1)).current;
+  const bodyImage = getBodyImage(item.id);
 
   function handleRemove() {
     Animated.sequence([
@@ -68,8 +71,12 @@ function FavoriteCard({ item, onRemove }: { item: FavoriteItem; onRemove: () => 
   return (
     <Animated.View style={[styles.card, { borderColor: item.accent + "30", transform: [{ scale: scaleAnim }] }]}>
       {/* Ícone */}
-      <View style={[styles.iconWrap, { backgroundColor: item.accent + "18", borderColor: item.accent + "33" }]}>
-        <Text style={styles.cardEmoji}>{item.emoji}</Text>
+      <View style={[styles.iconWrap, { backgroundColor: item.accent + "18", borderColor: item.accent + "33", overflow: "hidden" }]}>
+        {bodyImage ? (
+          <Image source={bodyImage} style={styles.cardImage} resizeMode="cover" />
+        ) : (
+          <Text style={styles.cardEmoji}>{item.emoji}</Text>
+        )}
       </View>
 
       {/* Info */}
@@ -198,7 +205,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
 
-  // Header
   header: {
     flexDirection: "row",
     alignItems: "flex-end",
@@ -232,7 +238,6 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
 
-  // Contador
   countRow: {
     paddingHorizontal: 20,
     marginBottom: 14,
@@ -243,7 +248,6 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
   },
 
-  // Filtros
   filtersRow: {
     paddingHorizontal: 16,
     gap: 8,
@@ -267,13 +271,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
 
-  // Lista
   list: {
     paddingHorizontal: 16,
     paddingBottom: 32,
   },
 
-  // Card
   card: {
     flexDirection: "row",
     alignItems: "center",
@@ -292,6 +294,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     flexShrink: 0,
+  },
+  cardImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 14,
   },
   cardEmoji: {
     fontSize: 24,
@@ -348,7 +355,6 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
 
-  // Empty state
   emptyWrap: {
     flex: 1,
     alignItems: "center",

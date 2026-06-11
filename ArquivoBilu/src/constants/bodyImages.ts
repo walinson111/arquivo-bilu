@@ -1,5 +1,12 @@
+// Mapeamento de imagens para todos os corpos celestes e estrelas.
+// Planetas principais usam texturas locais (require).
+// Demais corpos usam URLs públicas do Wikimedia Commons (domínio público / CC).
 
-export const BODY_IMAGES: Record<string, number> = {
+export type BodyImageSource = { uri: string } | number;
+
+// ─── Planetas principais — texturas locais ────────────────────────────────────
+
+const LOCAL: Record<string, number> = {
   sun:     require("../../assets/textures/sun.jpg"),
   mercury: require("../../assets/textures/mercury.jpg"),
   venus:   require("../../assets/textures/venus.jpg"),
@@ -11,6 +18,39 @@ export const BODY_IMAGES: Record<string, number> = {
   neptune: require("../../assets/textures/neptune.jpg"),
 };
 
-export function getBodyImage(id: string): number | null {
-  return BODY_IMAGES[id.toLowerCase()] ?? null;
+const REMOTE: Record<string, string> = {
+  // Planetas anões
+  pluto:    "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Pluto_in_True_Color_-_High-Res.jpg/480px-Pluto_in_True_Color_-_High-Res.jpg",
+  eris:     "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Eris_and_dysnomia2.jpg/480px-Eris_and_dysnomia2.jpg",
+  makemake: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Makemake_and_its_moon.jpg/480px-Makemake_and_its_moon.jpg",
+  haumea:   "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Haumea_Artistic_Impression.jpg/480px-Haumea_Artistic_Impression.jpg",
+  ceres:    "https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Ceres_-_RC3_-_Haulani_Crater_%2822381131691%29_%28cropped%29.jpg/480px-Ceres_-_RC3_-_Haulani_Crater_%2822381131691%29_%28cropped%29.jpg",
+
+  // Asteroides
+  vesta:    "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Vesta_full_mosaic.jpg/480px-Vesta_full_mosaic.jpg",
+  pallas:   "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Pallas_-_VLT_%28SPHERE%29_-_2020.jpg/480px-Pallas_-_VLT_%28SPHERE%29_-_2020.jpg",
+  hygiea:   "https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Hygiea_2020.jpg/480px-Hygiea_2020.jpg",
+  apophis:  "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Apophis%27_2029_Pass.png/480px-Apophis%27_2029_Pass.png",
+
+  // Cometas
+  halley:        "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Halley%27s_Comet_-_May_8_1910.jpg/480px-Halley%27s_Comet_-_May_8_1910.jpg",
+  churyumov:     "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/67P_on_19_September_2014_NavCam_mosaic.jpg/480px-67P_on_19_September_2014_NavCam_mosaic.jpg",
+  "hale-bopp":   "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Comet_Hale-Bopp_1995O1.jpg/480px-Comet_Hale-Bopp_1995O1.jpg",
+  encke:         "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Encke_Comet.jpg/480px-Encke_Comet.jpg",
+
+  // Estrelas 
+  sirius:      "https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Sirius_A_and_B_Hubble_photo.jpg/480px-Sirius_A_and_B_Hubble_photo.jpg",
+  betelgeuse:  "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/ESO-Betelgeuse.jpg/480px-ESO-Betelgeuse.jpg",
+  proxima:     "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Proxima_Centauri_2MASS_atlas.jpg/480px-Proxima_Centauri_2MASS_atlas.jpg",
+  rigel:       "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Rigel_2.jpg/480px-Rigel_2.jpg",
+  vega:        "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Vega_from_the_Hubble_Space_Telescope.jpg/480px-Vega_from_the_Hubble_Space_Telescope.jpg",
+  antares:     "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Antares_and_Rho_Ophiuchi_cross2.jpg/480px-Antares_and_Rho_Ophiuchi_cross2.jpg",
+  polaris:     "https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Polaris_alpha_ursae_minoris.jpg/480px-Polaris_alpha_ursae_minoris.jpg",
+};
+
+export function getBodyImage(id: string): BodyImageSource | null {
+  const key = id.toLowerCase();
+  if (LOCAL[key] !== undefined) return LOCAL[key];
+  if (REMOTE[key])              return { uri: REMOTE[key] };
+  return null;
 }

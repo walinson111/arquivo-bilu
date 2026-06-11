@@ -207,6 +207,7 @@ function BodyCard({ item, index, onPress }: { item: CelestialBody; index: number
 function StarCard({ star, index, onPress }: { star: Star; index: number; onPress: () => void }) {
   const slideAnim = useRef(new Animated.Value(40)).current;
   const fadeAnim  = useRef(new Animated.Value(0)).current;
+  const starImage = getBodyImage(star.id);
 
   useEffect(() => {
     Animated.parallel([
@@ -220,7 +221,6 @@ function StarCard({ star, index, onPress }: { star: Star; index: number; onPress
       ? `${(star.distanceLy * 63241).toFixed(0)} UA`
       : `${star.distanceLy} al`;
 
-  // Barra de temperatura (fria=3000K vermelho, quente=30000K azul) 0-100%
   const tempPercent = Math.min(Math.round(((star.surfaceTemp - 2000) / 28000) * 100), 100);
 
   return (
@@ -231,7 +231,11 @@ function StarCard({ star, index, onPress }: { star: Star; index: number; onPress
         android_ripple={{ color: star.accent + "22" }}
       >
         <View style={[styles.emojiWrap, { backgroundColor: star.accent + "18", borderColor: star.accent + "33" }]}>
-          <Text style={styles.emoji}>{star.emoji}</Text>
+          {starImage ? (
+            <Image source={starImage} style={styles.bodyImage} />
+          ) : (
+            <Text style={styles.emoji}>{star.emoji}</Text>
+          )}
         </View>
         <View style={styles.cardBody}>
           <View style={styles.cardTop}>
