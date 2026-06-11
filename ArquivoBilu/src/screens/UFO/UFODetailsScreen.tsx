@@ -19,7 +19,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Colors } from "../../theme/colors";
 import { Fonts } from "../../theme/fonts";
 import { TYPE_INFO, type UFOCase } from "./ufoData";
-import { searchNasaImages, type NasaImage } from "./nasaImageApi";
+import { getUFOImages, type LocalImage } from "./ufoImages";
 
 const { width: SCREEN_W } = Dimensions.get("window");
 const IMG_SIZE = (SCREEN_W - 48) / 3 - 6;
@@ -31,7 +31,7 @@ function GalleryThumb({
   accent,
   onPress,
 }: {
-  image: NasaImage;
+  image: LocalImage;
   accent: string;
   onPress: () => void;
 }) {
@@ -48,7 +48,7 @@ function GalleryThumb({
         </View>
       )}
       <Image
-        source={{ uri: image.thumb }}
+        source={image.source}
         style={[styles.thumbImg, !loaded && { position: "absolute", opacity: 0 }]}
         onLoad={() => setLoaded(true)}
         resizeMode="cover"
@@ -65,7 +65,7 @@ function ImageModal({
   accent,
   onClose,
 }: {
-  image: NasaImage | null;
+  image: LocalImage | null;
   visible: boolean;
   accent: string;
   onClose: () => void;
@@ -85,7 +85,7 @@ function ImageModal({
 
           {/* Imagem */}
           <Image
-            source={{ uri: image.thumb }}
+            source={image.source}
             style={styles.modalImg}
             resizeMode="contain"
           />
@@ -93,18 +93,8 @@ function ImageModal({
           {/* Info */}
           <View style={styles.modalInfo}>
             <Text style={[styles.modalTitle, { color: accent }]} numberOfLines={2}>
-              {image.title}
+              {image.caption}
             </Text>
-            {image.date_created ? (
-              <Text style={styles.modalDate}>
-                {new Date(image.date_created).getFullYear()} · NASA Image Library
-              </Text>
-            ) : null}
-            {image.description ? (
-              <Text style={styles.modalDesc} numberOfLines={4}>
-                {image.description}
-              </Text>
-            ) : null}
           </View>
         </View>
       </View>
@@ -114,40 +104,20 @@ function ImageModal({
 
 // ─── Seção de galeria ─────────────────────────────────────────────────────────
 
-function NasaGallery({ query, accent }: { query: string; accent: string }) {
-  const [images,  setImages]  = useState<NasaImage[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selected, setSelected] = useState<NasaImage | null>(null);
+function LocalGallery({ caseId, accent }: { caseId: string; accent: string }) {
+  const images = getUFOImages(caseId);
+  const [selected, setSelected] = useState<LocalImage | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
 
-  useEffect(() => {
-    if (!query) { setLoading(false); return; }
-    searchNasaImages(query, 6).then(imgs => {
-      setImages(imgs);
-      setLoading(false);
-    });
-  }, [query]);
-
-  function openImage(img: NasaImage) {
+  function openImage(img: LocalImage) {
     setSelected(img);
     setModalVisible(true);
-  }
-
-  if (loading) {
-    return (
-      <View style={styles.galleryLoading}>
-        <ActivityIndicator color={accent} />
-        <Text style={[styles.galleryLoadingText, { color: accent }]}>
-          Buscando imagens NASA...
-        </Text>
-      </View>
-    );
   }
 
   if (images.length === 0) {
     return (
       <View style={styles.galleryEmpty}>
-        <Text style={styles.galleryEmptyText}>Nenhuma imagem encontrada</Text>
+        <Text style={styles.galleryEmptyText}>Nenhuma imagem disponível</Text>
       </View>
     );
   }
@@ -155,16 +125,16 @@ function NasaGallery({ query, accent }: { query: string; accent: string }) {
   return (
     <>
       <View style={styles.gallery}>
-        {images.map(img => (
+        {images.map((img, i) => (
           <GalleryThumb
-            key={img.nasa_id}
+            key={i}
             image={img}
             accent={accent}
             onPress={() => openImage(img)}
           />
         ))}
       </View>
-      <Text style={styles.galleryCredit}>📷 NASA Image & Video Library</Text>
+      <Text style={styles.galleryCredit}>📷 Arquivo de Documentação</Text>
 
       <ImageModal
         image={selected}
@@ -240,11 +210,11 @@ export function UFODetailsScreen({ route }: any) {
           <Text style={styles.descText}>{ufoCase.fullDescription}</Text>
         </View>
 
-        {/* ─ Galeria NASA ─ */}
-        {ufoCase.nasaQuery !== "" && (
+        {/* ─ Galeria de Imagens ─ */}
+        {!ufoCase.restricted && (
           <>
             <Text style={[styles.sectionTitle, { color: typeInfo.accent }]}>IMAGENS RELACIONADAS</Text>
-            <NasaGallery query={ufoCase.nasaQuery} accent={typeInfo.accent} />
+            <LocalGallery caseId={ufoCase.id} accent={typeInfo.accent} />
           </>
         )}
 
