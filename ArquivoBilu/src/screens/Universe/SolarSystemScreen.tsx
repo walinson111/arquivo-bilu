@@ -281,8 +281,12 @@ function TestPlanet() {
 }
 // ─── Sol ──────────────────────────────────────────────────────────────────────
 
-function Sun() {
+function SunMesh() {
   const meshRef = useRef<THREE.Mesh>(null);
+  const texture = useLoader(
+    TextureLoader,
+    Asset.fromModule(require("../../../assets/textures/sun.jpg")).uri
+  ) as THREE.Texture;
 
   useFrame(() => {
     if (meshRef.current) meshRef.current.rotation.y += 0.002;
@@ -290,15 +294,29 @@ function Sun() {
 
   return (
     <mesh ref={meshRef}>
-      <sphereGeometry args={[1.0, 48, 48]} />
+      <sphereGeometry args={[1.0, 64, 64]} />
       <meshStandardMaterial
-        color="#FDB813"
-        emissive="#F97316"
-        emissiveIntensity={1.2}
+        map={texture}
+        emissiveMap={texture}
+        emissive="#FF6A00"
+        emissiveIntensity={0.55}
         roughness={1}
         metalness={0}
       />
     </mesh>
+  );
+}
+
+function Sun() {
+  return (
+    <Suspense fallback={
+      <mesh>
+        <sphereGeometry args={[1.0, 48, 48]} />
+        <meshStandardMaterial color="#FDB813" emissive="#F97316" emissiveIntensity={1.2} roughness={1} metalness={0} />
+      </mesh>
+    }>
+      <SunMesh />
+    </Suspense>
   );
 }
 
