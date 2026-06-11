@@ -1,13 +1,14 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useRef } from "react";
-import { Animated, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Animated, Image, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Colors } from "../../theme/colors";
 import { Fonts } from "../../theme/fonts";
 import type { Star } from "../../services/solarSystemApi";
 import { useFavoritesContext } from "../../context/FavoritesContext";
+import { getBodyImage } from "../../constants/bodyImages";
 
 // ─── Stat Card ────────────────────────────────────────────────────────────────
 
@@ -87,6 +88,7 @@ function SolarCompareBar({
 function StarHero({ star }: { star: Star }) {
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const glowAnim  = useRef(new Animated.Value(0.15)).current;
+  const starImage = getBodyImage(star.id);
 
   useEffect(() => {
     Animated.loop(
@@ -108,9 +110,13 @@ function StarHero({ star }: { star: Star }) {
       {/* Glow externo animado */}
       <Animated.View style={[styles.heroGlow, { backgroundColor: star.accent, opacity: glowAnim }]} />
 
-      {/* Emoji da estrela com pulso */}
+      {/* Imagem real ou emoji com pulso */}
       <Animated.View style={[styles.heroOrb, { borderColor: star.accent + "55", transform: [{ scale: pulseAnim }] }]}>
-        <Text style={styles.heroEmoji}>{star.emoji}</Text>
+        {starImage ? (
+          <Image source={starImage} style={styles.heroImage} resizeMode="cover" />
+        ) : (
+          <Text style={styles.heroEmoji}>{star.emoji}</Text>
+        )}
       </Animated.View>
 
       {/* Badge de classe */}
@@ -277,7 +283,9 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(30,41,59,0.6)",
     borderWidth: 1.5,
     alignItems: "center", justifyContent: "center",
+    overflow: "hidden",
   },
+  heroImage:   { width: "100%", height: "100%" },
   heroEmoji:   { fontSize: 72 },
   classBadge:  { paddingHorizontal: 14, paddingVertical: 5, borderRadius: 100, borderWidth: 1 },
   classBadgeText: { fontFamily: Fonts.spaceGroteskBold, fontSize: 11, letterSpacing: 0.8 },
