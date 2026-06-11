@@ -1,4 +1,4 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Colors } from "../../theme/colors";
@@ -8,6 +8,8 @@ import { useRef } from "react";
 import { TextureLoader, THREE } from "expo-three";
 import { Asset } from "expo-asset";
 import { PLANET_TEXTURES } from "../../constants/textures";
+import { getBodyImage } from "../../constants/bodyImages";
+import { SOLAR_SYSTEM_BODIES } from "../../services/solarSystemApi";
 import type { PlanetDetailsProps } from "../../navigation/types";
 import { useFavoritesContext } from "../../context/FavoritesContext";
 
@@ -81,7 +83,10 @@ function PlanetPreview({ planetId }: { planetId: string }) {
 // ─── Tela Principal ───────────────────────────────────────────────────────────
 
 export function PlanetDetailsScreen({ route }: PlanetDetailsProps) {
-  const { planet } = route.params;
+  const rawPlanet = route.params.planet;
+  const planet = (rawPlanet.gravity == null && rawPlanet.density == null)
+    ? (SOLAR_SYSTEM_BODIES.find((b) => b.id === rawPlanet.id) ?? rawPlanet)
+    : rawPlanet;
   const insets = useSafeAreaInsets();
   const visual = getPlanetVisual(planet.id);
 
@@ -115,11 +120,23 @@ export function PlanetDetailsScreen({ route }: PlanetDetailsProps) {
           <View style={[styles.planetGlow, { backgroundColor: visual.accent }]} />
 
           <View style={[styles.planetViewer, { borderColor: visual.accent + "44" }]}>
-            <Canvas camera={{ position: [0, 0, 3] as [number, number, number] }}>
-              <ambientLight intensity={2} />
-              <pointLight position={[5, 5, 5] as [number, number, number]} intensity={10} />
-              <PlanetPreview planetId={planet.id} />
-            </Canvas>
+            {PLANET_TEXTURES[planet.id] ? (
+              <Canvas camera={{ position: [0, 0, 3] as [number, number, number] }}>
+                <ambientLight intensity={2} />
+                <pointLight position={[5, 5, 5] as [number, number, number]} intensity={10} />
+                <PlanetPreview planetId={planet.id} />
+              </Canvas>
+            ) : getBodyImage(planet.id) ? (
+              <Image
+                source={getBodyImage(planet.id)!}
+                style={styles.planetImage}
+                resizeMode="cover"
+              />
+            ) : (
+              <View style={styles.planetEmojiWrap}>
+                <Text style={styles.planetEmoji}>{visual.emoji}</Text>
+              </View>
+            )}
           </View>
 
           <View style={[styles.typeBadge, { backgroundColor: visual.accent + "1A", borderColor: visual.accent + "44" }]}>
@@ -274,6 +291,18 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     alignSelf: "center",
     backgroundColor: "rgba(255,255,255,0.02)",
+  },
+  planetImage: {
+    width: "100%",
+    height: "100%",
+  },
+  planetEmojiWrap: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  planetEmoji: {
+    fontSize: 80,
   },
   planetGlow: {
     position: "absolute",
