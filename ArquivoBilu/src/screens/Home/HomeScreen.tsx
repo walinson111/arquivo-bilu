@@ -20,6 +20,7 @@ import { Colors } from "../../theme/colors";
 import { Fonts } from "../../theme/fonts";
 import type { Apod } from "../../types/apod";
 import { FEATURED_HOME as FEATURED, TRENDING_HOME as TRENDING } from "../../constants/homeData";
+import { getBodyImage } from "../../constants/bodyImages";
 
 const { width: SCREEN_W } = Dimensions.get("window");
 
@@ -71,11 +72,16 @@ function FeaturedCard({ item, onPress }: { item: typeof FEATURED[0]; onPress: ()
 }
 
 function TrendingRow({ item, onPress, isLast }: { item: typeof TRENDING[0]; onPress: () => void; isLast: boolean }) {
+  const bodyImage = getBodyImage(item.id);
   return (
     <>
       <Pressable onPress={onPress} style={({ pressed }) => [styles.trendRow, { opacity: pressed ? 0.75 : 1 }]}>
-        <View style={[styles.trendIcon, { backgroundColor: item.accent + "18", borderColor: item.accent + "30" }]}>
-          <Text style={styles.trendEmoji}>{item.emoji}</Text>
+        <View style={[styles.trendIcon, { backgroundColor: item.accent + "18", borderColor: item.accent + "30", overflow: "hidden" }]}>
+          {bodyImage ? (
+            <Image source={bodyImage} style={styles.trendImage} />
+          ) : (
+            <Text style={styles.trendEmoji}>{item.emoji}</Text>
+          )}
         </View>
         <View style={styles.trendText}>
           <Text style={styles.trendName}>{item.name}</Text>
@@ -301,6 +307,7 @@ const styles = StyleSheet.create({
   card:        { marginHorizontal: 16, backgroundColor: "rgba(30,41,59,0.55)", borderRadius: 16, borderWidth: 1, overflow: "hidden" },
   trendRow:    { flexDirection: "row", alignItems: "center", gap: 12, padding: 13 },
   trendIcon:   { width: 40, height: 40, borderRadius: 12, borderWidth: 1, alignItems: "center", justifyContent: "center" },
+  trendImage:  { width: 40, height: 40, borderRadius: 12 },
   trendEmoji:  { fontSize: 18 },
   trendText:   { flex: 1, gap: 2 },
   trendName:   { fontFamily: Fonts.spaceGroteskBold, color: Colors.text, fontSize: 14 },
