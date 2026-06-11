@@ -5,6 +5,7 @@ import {
   ActivityIndicator,
   Animated,
   FlatList,
+  Image,
   Pressable,
   StyleSheet,
   Text,
@@ -15,6 +16,7 @@ import { Colors } from "../../theme/colors";
 import { Fonts } from "../../theme/fonts";
 import { getBodies, getStars } from "../../services/solarSystemApi";
 import type { CelestialBody, Star } from "../../services/solarSystemApi";
+import { getBodyImage } from "../../constants/bodyImages";
 
 // ─── Dados visuais por ID ─────────────────────────────────────────────────────
 
@@ -139,6 +141,7 @@ function ComparisonCard({ onPress }: { onPress: () => void }) {
 
 function BodyCard({ item, index, onPress }: { item: CelestialBody; index: number; onPress: () => void }) {
   const visual    = getBodyVisual(item);
+  const bodyImage = getBodyImage(item.id);
   const slideAnim = useRef(new Animated.Value(40)).current;
   const fadeAnim  = useRef(new Animated.Value(0)).current;
 
@@ -172,7 +175,11 @@ function BodyCard({ item, index, onPress }: { item: CelestialBody; index: number
         android_ripple={{ color: visual.accent + "22" }}
       >
         <View style={[styles.emojiWrap, { backgroundColor: visual.accent + "18", borderColor: visual.accent + "33" }]}>
-          <Text style={styles.emoji}>{visual.emoji}</Text>
+          {bodyImage ? (
+            <Image source={bodyImage} style={styles.bodyImage} />
+          ) : (
+            <Text style={styles.emoji}>{visual.emoji}</Text>
+          )}
         </View>
         <View style={styles.cardBody}>
           <View style={styles.cardTop}>
@@ -375,7 +382,7 @@ export function UniverseScreen() {
             return <SolarSystemCard onPress={() => navigation.navigate("SolarSystem")} />;
           }
           if (item.kind === "comparison_card") {
-            return <ComparisonCard onPress={() => navigation.navigate("PlanetSelector")} />;
+            return <ComparisonCard onPress={() => navigation.navigate("PlanetComparison", { planet: planets[2] ?? planets[0] })} />;
           }
           if (item.kind === "divider") {
             return <SectionDivider label={item.label} count={item.count} emoji={item.emoji} />;
@@ -445,7 +452,8 @@ const styles = StyleSheet.create({
   list: { paddingBottom: 32 },
 
   card:     { flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: "rgba(30, 41, 59, 0.55)", borderRadius: 16, borderWidth: 1, padding: 14, marginBottom: 10, marginHorizontal: 16 },
-  emojiWrap:{ width: 52, height: 52, borderRadius: 14, borderWidth: 1, alignItems: "center", justifyContent: "center", flexShrink: 0 },
+  emojiWrap:{ width: 52, height: 52, borderRadius: 14, borderWidth: 1, alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden" },
+  bodyImage:{ width: 52, height: 52, borderRadius: 14 },
   emoji:    { fontSize: 26 },
   cardBody: { flex: 1, gap: 6 },
   cardTop:  { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8 },

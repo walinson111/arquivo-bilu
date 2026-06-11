@@ -1,0 +1,16 @@
+
+export const BODY_IMAGES: Record<string, number> = {
+  sun:     require("../../assets/textures/sun.jpg"),
+  mercury: require("../../assets/textures/mercury.jpg"),
+  venus:   require("../../assets/textures/venus.jpg"),
+  earth:   require("../../assets/textures/earth.jpg"),
+  mars:    require("../../assets/textures/mars.jpg"),
+  jupiter: require("../../assets/textures/jupiter.jpg"),
+  saturn:  require("../../assets/textures/saturn.jpg"),
+  uranus:  require("../../assets/textures/uranus.jpg"),
+  neptune: require("../../assets/textures/neptune.jpg"),
+};
+
+export function getBodyImage(id: string): number | null {
+  return BODY_IMAGES[id.toLowerCase()] ?? null;
+}
