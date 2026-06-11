@@ -90,18 +90,25 @@ const rotate = orbitAnim.interpolate({
 });
 
 useEffect(() => {
-  orbitAnim.setValue(0);
+  let animation: Animated.CompositeAnimation;
 
-  Animated.loop(
-    Animated.timing(orbitAnim, {
+  function startLoop() {
+    orbitAnim.setValue(0);
+    animation = Animated.timing(orbitAnim, {
       toValue: 1,
       duration: 15000,
       useNativeDriver: true,
-    }),
-    {
-      resetBeforeIteration: true,
-    }
-  ).start();
+    });
+    animation.start(({ finished }) => {
+      if (finished) startLoop();
+    });
+  }
+
+  startLoop();
+
+  return () => {
+    animation?.stop();
+  };
 }, []);
 
   useEffect(() => {
@@ -578,8 +585,8 @@ const styles = StyleSheet.create({
   list: { paddingBottom: 32 },
 
   card:     { flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: "rgba(30, 41, 59, 0.55)", borderRadius: 16, borderWidth: 1, padding: 14, marginBottom: 10, marginHorizontal: 16 },
-  emojiWrap:{ width: 52, height: 52, borderRadius: 14, borderWidth: 1, alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden" },
-  bodyImage:{ width: 52, height: 52, borderRadius: 14 },
+  emojiWrap:{ width: 52, height: 52, borderRadius: 26, borderWidth: 1, alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden" },
+  bodyImage:{ width: 52, height: 52, borderRadius: 26 },
   emoji:    { fontSize: 26 },
   cardBody: { flex: 1, gap: 6 },
   cardTop:  { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8 },
