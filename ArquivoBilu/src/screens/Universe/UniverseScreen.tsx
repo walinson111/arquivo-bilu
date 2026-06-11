@@ -17,6 +17,7 @@ import { Fonts } from "../../theme/fonts";
 import { getBodies, getStars } from "../../services/solarSystemApi";
 import type { CelestialBody, Star } from "../../services/solarSystemApi";
 import { getBodyImage } from "../../constants/bodyImages";
+import { LinearGradient } from "expo-linear-gradient";
 
 // ─── Dados visuais por ID ─────────────────────────────────────────────────────
 
@@ -56,51 +57,173 @@ function getBodyVisual(item: CelestialBody) {
 }
 
 // ─── Card do Sistema Solar 3D ─────────────────────────────────────────────────
+const planets = [
+  require("../../../assets/textures/saturn.jpg"),
+  require("../../../assets/textures/earth.jpg"),
+  require("../../../assets/textures/mars.jpg"),
+  require("../../../assets/textures/neptune.jpg"),
+];
 
 function SolarSystemCard({ onPress }: { onPress: () => void }) {
   const scaleAnim = useRef(new Animated.Value(0.96)).current;
-  const fadeAnim  = useRef(new Animated.Value(0)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  const orbitAnim = useRef(new Animated.Value(0)).current;
+  const orbitRotate1 = orbitAnim.interpolate({
+  inputRange: [0, 1],
+  outputRange: ["0deg", "360deg"],
+});
+
+const orbitRotate2 = orbitAnim.interpolate({
+  inputRange: [0, 1],
+  outputRange: ["0deg", "-360deg"],
+});
+
+const orbitRotate3 = orbitAnim.interpolate({
+  inputRange: [0, 1],
+  outputRange: ["0deg", "180deg"],
+});
+
+const rotate = orbitAnim.interpolate({
+  inputRange: [0, 1],
+  outputRange: ["0deg", "360deg"],
+});
+
+useEffect(() => {
+  orbitAnim.setValue(0);
+
+  Animated.loop(
+    Animated.timing(orbitAnim, {
+      toValue: 1,
+      duration: 15000,
+      useNativeDriver: true,
+    }),
+    {
+      resetBeforeIteration: true,
+    }
+  ).start();
+}, []);
 
   useEffect(() => {
     Animated.parallel([
-      Animated.timing(fadeAnim,  { toValue: 1, duration: 500, useNativeDriver: true }),
-      Animated.spring(scaleAnim, { toValue: 1, speed: 14, bounciness: 6, useNativeDriver: true }),
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      }),
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        speed: 14,
+        bounciness: 6,
+        useNativeDriver: true,
+      }),
     ]).start();
   }, []);
 
   return (
-    <Animated.View style={{ opacity: fadeAnim, transform: [{ scale: scaleAnim }] }}>
+    <Animated.View
+      style={{
+        opacity: fadeAnim,
+        transform: [{ scale: scaleAnim }],
+      }}
+    >
       <Pressable
         onPress={onPress}
-        style={({ pressed }) => [styles.solarCard, { opacity: pressed ? 0.88 : 1 }]}
+        style={({ pressed }) => [
+          styles.solarCard,
+          { opacity: pressed ? 0.88 : 1 },
+        ]}
         android_ripple={{ color: Colors.cosmicBlue + "22" }}
       >
+        {/* Planetas decorativos */}
         <View style={styles.solarCardBg} pointerEvents="none">
-          {["🪐", "🌍", "🔴", "🌊"].map((emoji, i) => (
-            <Text key={i} style={[styles.bgEmoji, { right: 12 + i * 30, top: 8 + (i % 2) * 14, opacity: 0.18 + i * 0.06, fontSize: 28 - i * 3 }]}>
-              {emoji}
-            </Text>
-          ))}
+          {planets.map((planet, i) => {
+            const size = 30 - i * 3;
+
+            return (
+              <Image
+                key={i}
+                source={planet}
+                resizeMode="cover"
+                style={[
+                  styles.bgPlanet,
+                  {
+                    width: size,
+                    height: size,
+                    right: 12 + i * 30,
+                    top: 8 + (i % 2) * 14,
+                    opacity: 0.18 + i * 0.06,
+                  },
+                ]}
+              />
+            );
+          })}
         </View>
-        <View style={styles.solarCardContent}>
-          <View style={styles.solarCardLeft}>
-            <View style={styles.solarIconWrap}>
-              <Text style={styles.solarIcon}>🌌</Text>
-            </View>
-            <View style={styles.solarBadge}>
-              <Text style={styles.solarBadgeText}>3D</Text>
-            </View>
-          </View>
-          <View style={styles.solarCardBody}>
-            <Text style={styles.solarTitle}>Sistema Solar</Text>
-            <Text style={styles.solarSub}>Explore os planetas em visualização tridimensional interativa</Text>
-          </View>
-          <View style={styles.solarArrowWrap}>
-            <Ionicons name="chevron-forward" size={20} color={Colors.cosmicBlue} />
-          </View>
-        </View>
-        <View style={styles.solarGlowLine} />
-      </Pressable>
+
+       <View style={styles.solarCardContent}>
+  <View style={styles.solarCardLeft}>
+    <View style={styles.solarIconWrap}>
+      <LinearGradient
+        colors={["#FFD54F", "#FF9800"]}
+        style={styles.sunCore}
+      />
+
+<Animated.View
+  style={[
+    styles.orbit1,
+    {
+      transform: [{ rotate }],
+    },
+  ]}
+>
+  <View style={styles.planetBlue} />
+</Animated.View>
+
+<Animated.View
+  style={[
+    styles.orbit2,
+    { transform: [{ rotate: orbitRotate2 }] },
+  ]}
+>
+  <View style={styles.planetRed} />
+</Animated.View>
+
+<Animated.View
+  style={[
+    styles.orbit3,
+    { transform: [{ rotate: orbitRotate3 }] },
+  ]}
+>
+  <View style={styles.planetGreen} />
+</Animated.View>
+
+</View>
+
+<View style={styles.solarBadge}>
+  <Text style={styles.solarBadgeText}>3D</Text>
+</View>
+  </View>
+
+  <View style={styles.solarCardBody}>
+    <Text style={styles.solarTitle}>Sistema Solar</Text>
+    <Text style={styles.solarSub}>
+      Explore os planetas em visualização tridimensional interativa
+    </Text>
+  </View>
+
+  <View style={styles.solarArrowWrap}>
+  <Ionicons
+    name="chevron-forward"
+    size={20}
+    color={Colors.cosmicBlue}
+  />
+</View>
+
+</View>
+
+<View style={styles.solarGlowLine} />
+
+</Pressable>
     </Animated.View>
   );
 }
@@ -435,7 +558,6 @@ const styles = StyleSheet.create({
   bgEmoji:          { position: "absolute" },
   solarCardContent: { flexDirection: "row", alignItems: "center", padding: 16, gap: 14 },
   solarCardLeft:    { alignItems: "center", gap: 6 },
-  solarIconWrap:    { width: 56, height: 56, borderRadius: 16, backgroundColor: Colors.cosmicBlue + "18", borderWidth: 1, borderColor: Colors.cosmicBlue + "35", alignItems: "center", justifyContent: "center" },
   solarIcon:        { fontSize: 28 },
   solarBadge:       { backgroundColor: Colors.cosmicBlue + "20", borderWidth: 1, borderColor: Colors.cosmicBlue + "55", borderRadius: 100, paddingHorizontal: 8, paddingVertical: 2 },
   solarBadgeText:   { fontFamily: Fonts.orbitron, fontSize: 8, color: Colors.cosmicBlue, letterSpacing: 1.5 },
@@ -475,4 +597,136 @@ const styles = StyleSheet.create({
   errorTitle:  { fontFamily: Fonts.orbitron, color: Colors.text, fontSize: 16, marginBottom: 20 },
   retryBtn:    { paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12, borderWidth: 1, borderColor: Colors.biluGreen + "66", backgroundColor: Colors.biluGreen + "15" },
   retryText:   { fontFamily: Fonts.orbitron, color: Colors.biluGreen, fontSize: 11, letterSpacing: 1 },
-});
+
+  bgPlanet: {
+  position: "absolute",
+  borderRadius: 999,
+},
+
+solarIconImage: {
+  width: 42,
+  height: 42,
+  borderRadius: 21,
+},
+
+solarIconWrap: {
+  width: 64,
+  height: 64,
+  borderRadius: 32,
+
+  justifyContent: "center",
+  alignItems: "center",
+
+  borderWidth: 1,
+  borderColor: "rgba(59,130,246,0.35)",
+
+  backgroundColor: "rgba(10,20,40,0.85)",
+
+  overflow: "hidden",
+
+  shadowColor: Colors.cosmicBlue,
+  shadowOpacity: 0.6,
+  shadowRadius: 15,
+  shadowOffset: {
+    width: 0,
+    height: 0,
+  },
+
+  elevation: 10,
+},
+sunCore: {
+  width: 18,
+  height: 18,
+  borderRadius: 9,
+
+  shadowColor: "#FFD54F",
+  shadowOpacity: 0.9,
+  shadowRadius: 12,
+  shadowOffset: {
+    width: 0,
+    height: 0,
+  },
+
+  elevation: 10,
+},
+
+orbit1: {
+  position: "absolute",
+  width: 30,
+  height: 30,
+  borderRadius: 15,
+  borderWidth: 1,
+  borderColor: "rgba(255,255,255,0.15)",
+  justifyContent: "flex-start",
+  alignItems: "center",
+},
+
+orbit2: {
+  position: "absolute",
+  width: 46,
+  height: 46,
+  borderRadius: 23,
+  borderWidth: 1,
+  borderColor: "rgba(255,255,255,0.10)",
+  justifyContent: "center",
+},
+
+planet1: {
+  width: 5,
+  height: 5,
+  borderRadius: 3,
+  backgroundColor: "#4FC3F7",
+  marginTop: -2,
+},
+
+planet2: {
+  position: "absolute",
+  width: 6,
+  height: 6,
+  borderRadius: 3,
+  backgroundColor: "#FF7043",
+  right: -3,
+  top: 20,
+},
+orbit3: {
+  position: "absolute",
+  width: 54,
+  height: 54,
+  borderRadius: 27,
+  borderWidth: 1,
+  borderColor: "rgba(255,255,255,0.08)",
+},
+
+planetBlue: {
+  position: "absolute",
+  top: -3,
+  left: "50%",
+  marginLeft: -3,
+
+  width: 6,
+  height: 6,
+  borderRadius: 3,
+
+  backgroundColor: "#4FC3F7",
+},
+
+planetRed: {
+  position: "absolute",
+  width: 6,
+  height: 6,
+  borderRadius: 3,
+  backgroundColor: "#FF7043",
+  right: -3,
+  top: 18,
+},
+
+planetGreen: {
+  position: "absolute",
+  width: 5,
+  height: 5,
+  borderRadius: 3,
+  backgroundColor: "#81C784",
+  left: -2,
+  bottom: 12,
+},},
+);
