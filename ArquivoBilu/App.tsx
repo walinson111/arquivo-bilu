@@ -13,10 +13,12 @@ import * as SplashScreen from "expo-splash-screen";
 import { useCallback } from "react";
 import { View } from "react-native";
 
-import { AppNavigator } from "./src/navigation/AppNavigator";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import { AppNavigator }    from "./src/navigation/AppNavigator";
 import { FavoritesProvider } from "./src/context/FavoritesContext";
-import { Colors } from "./src/theme/colors";
-import { navigationRef } from "./src/navigation/navigationRef";
+import { AuthProvider }    from "./src/context/AuthContext";
+import { Colors }          from "./src/theme/colors";
+import { navigationRef }   from "./src/navigation/navigationRef";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -38,13 +40,16 @@ export default function App() {
   }
 
   return (
-    <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
-      <FavoritesProvider>
-        {/* ref aqui garante que navigationRef funciona de qualquer tela */}
-        <NavigationContainer ref={navigationRef}>
-          <AppNavigator />
-        </NavigationContainer>
-      </FavoritesProvider>
-    </View>
+    <SafeAreaProvider>
+      <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
+        <AuthProvider>
+          <FavoritesProvider>
+            <NavigationContainer ref={navigationRef}>
+              <AppNavigator />
+            </NavigationContainer>
+          </FavoritesProvider>
+        </AuthProvider>
+      </View>
+    </SafeAreaProvider>
   );
 }
