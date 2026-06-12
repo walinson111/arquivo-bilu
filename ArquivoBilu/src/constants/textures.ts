@@ -1,4 +1,5 @@
 export const PLANET_TEXTURES: Record<string, number> = {
+  sun:     require("../../assets/textures/sun.jpg"),
   mercury: require("../../assets/textures/mercury.jpg"),
   venus:   require("../../assets/textures/venus.jpg"),
   earth:   require("../../assets/textures/earth.jpg"),
