@@ -11,7 +11,7 @@ export interface UFOCase {
   summary: string;
   fullDescription: string;
   evidence: string[];
-  nasaQuery: string; // query para buscar imagens na NASA Image API
+  nasaQuery: string; 
 }
 
 export const UFO_CASES: UFOCase[] = [
