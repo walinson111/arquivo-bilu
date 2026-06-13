@@ -5,6 +5,7 @@ import { Animated, Image, Pressable, ScrollView, StyleSheet, Text, TouchableOpac
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Colors } from "../../theme/colors";
+import { starDetailsStyles as styles } from "./StarDetailsScreen.styles";
 import { Fonts } from "../../theme/fonts";
 import type { Star } from "../../services/solarSystemApi";
 import { useFavoritesContext } from "../../context/FavoritesContext";
@@ -260,88 +261,3 @@ export function StarDetailsScreen({ route }: any) {
   );
 }
 
-// ─── Estilos ──────────────────────────────────────────────────────────────────
-
-const styles = StyleSheet.create({
-  root:   { flex: 1, backgroundColor: Colors.background },
-  scroll: { paddingHorizontal: 20, paddingBottom: 48 },
-
-  header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: 12 },
-  backBtn: {
-    width: 40, height: 40, borderRadius: 12,
-    backgroundColor: "rgba(255,255,255,0.07)",
-    borderWidth: 1, borderColor: "rgba(255,255,255,0.1)",
-    alignItems: "center", justifyContent: "center",
-  },
-  headerLabel: { fontFamily: Fonts.orbitron, fontSize: 10, color: Colors.textSecondary, letterSpacing: 2 },
-
-  // Hero
-  heroSection: { alignItems: "center", paddingVertical: 32, gap: 12, position: "relative" },
-  heroGlow:    { position: "absolute", top: 20, width: 200, height: 200, borderRadius: 100, transform: [{ scale: 1.5 }] },
-  heroOrb:     {
-    width: 160, height: 160, borderRadius: 80,
-    backgroundColor: "rgba(30,41,59,0.6)",
-    borderWidth: 1.5,
-    alignItems: "center", justifyContent: "center",
-    overflow: "hidden",
-  },
-  heroImage:   { width: "100%", height: "100%" },
-  heroEmoji:   { fontSize: 72 },
-  classBadge:  { paddingHorizontal: 14, paddingVertical: 5, borderRadius: 100, borderWidth: 1 },
-  classBadgeText: { fontFamily: Fonts.spaceGroteskBold, fontSize: 11, letterSpacing: 0.8 },
-  starName:    { fontFamily: Fonts.orbitron, fontSize: 30, color: Colors.text, letterSpacing: 1, textAlign: "center" },
-  constellation: { fontFamily: Fonts.spaceGrotesk, fontSize: 13, color: Colors.textSecondary, letterSpacing: 0.5 },
-  description: { fontFamily: Fonts.spaceGrotesk, fontSize: 14, color: Colors.textSecondary, textAlign: "center", lineHeight: 22, marginBottom: 4 },
-
-  sectionTitle: { fontFamily: Fonts.orbitron, fontSize: 10, letterSpacing: 2.5, marginBottom: 12, marginTop: 16 },
-
-  // Stats
-  statsGrid: { flexDirection: "row", flexWrap: "wrap", gap: 10, marginBottom: 10 },
-  statCard:  { flex: 1, minWidth: "28%", backgroundColor: "rgba(30,41,59,0.55)", borderRadius: 14, borderWidth: 1, padding: 14, gap: 4 },
-  statValue: { fontFamily: Fonts.orbitron, fontSize: 15, fontWeight: "700" },
-  statUnit:  { fontFamily: Fonts.spaceGrotesk, fontSize: 10, color: Colors.textSecondary },
-  statLabel: { fontFamily: Fonts.spaceGrotesk, fontSize: 11, color: Colors.textSecondary },
-
-  // Comparação
-  compareCard: { backgroundColor: "rgba(30,41,59,0.55)", borderRadius: 16, borderWidth: 1, padding: 16, marginBottom: 4, gap: 14 },
-  compareRow:  { gap: 6 },
-  compareHeader: { flexDirection: "row", justifyContent: "space-between" },
-  compareLabel:  { fontFamily: Fonts.spaceGrotesk, fontSize: 12, color: Colors.textSecondary },
-  compareValue:  { fontFamily: Fonts.spaceGroteskBold, fontSize: 12 },
-  compareTrack:  { height: 6, backgroundColor: "rgba(255,255,255,0.07)", borderRadius: 3, overflow: "visible", position: "relative" },
-  compareFill:   { height: "100%", borderRadius: 3 },
-  solarMarker:   { position: "absolute", top: -3, width: 2, height: 12, backgroundColor: "rgba(255,255,255,0.4)", borderRadius: 1 },
-  compareHint:   { fontFamily: Fonts.spaceGrotesk, fontSize: 10, color: Colors.textSecondary, opacity: 0.5 },
-  compareDivider:{ height: 1, backgroundColor: "rgba(255,255,255,0.05)" },
-
-  // Curiosidade
-  curiosityCard: {
-    flexDirection: "row", gap: 12, alignItems: "flex-start",
-    backgroundColor: "rgba(30,41,59,0.55)",
-    borderRadius: 14, borderWidth: 1,
-    borderLeftWidth: 3, padding: 16, marginBottom: 4,
-  },
-  curiosityEmoji: { fontSize: 20, marginTop: 1 },
-  curiosityText:  { flex: 1, fontFamily: Fonts.spaceGrotesk, fontSize: 14, color: Colors.text, lineHeight: 22 },
-
-  // Info card
-  infoCard: { backgroundColor: "rgba(30,41,59,0.55)", borderRadius: 14, borderWidth: 1, marginBottom: 24, overflow: "hidden" },
-  infoRow:  { flexDirection: "row", justifyContent: "space-between", alignItems: "center", padding: 14 },
-  infoLabel:{ fontFamily: Fonts.spaceGrotesk, fontSize: 13, color: Colors.textSecondary },
-  infoValue:{ fontFamily: Fonts.spaceGroteskBold, fontSize: 13, color: Colors.text },
-
-  // Favoritar
-  favBtn: {
-    position: "absolute",
-    top: 16,
-    right: 16,
-    zIndex: 10,
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: "rgba(2,6,23,0.75)",
-    borderWidth: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});

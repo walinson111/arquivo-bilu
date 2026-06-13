@@ -7,12 +7,14 @@ import {
   FlatList,
   Image,
   Pressable,
-  StyleSheet,
+
   Text,
   View,
 } from "react-native";
 
 import { Colors } from "../../theme/colors";
+import { feedbackStyles, layoutStyles } from "../../theme/styles";
+import { universeStyles as styles } from "./UniverseScreen.styles";
 import { Fonts } from "../../theme/fonts";
 import { getBodies, getStars } from "../../services/solarSystemApi";
 import type { CelestialBody, Star } from "../../services/solarSystemApi";
@@ -419,20 +421,20 @@ export function UniverseScreen() {
 
   if (loading) {
     return (
-      <View style={styles.centered}>
+      <View style={feedbackStyles.centered}>
         <ActivityIndicator size="large" color={Colors.biluGreen} />
-        <Text style={styles.loadingText}>MAPEANDO O UNIVERSO...</Text>
+        <Text style={feedbackStyles.loadingText}>MAPEANDO O UNIVERSO...</Text>
       </View>
     );
   }
 
   if (error) {
     return (
-      <View style={styles.centered}>
+      <View style={feedbackStyles.centered}>
         <Text style={{ fontSize: 40, marginBottom: 16 }}>🛸</Text>
-        <Text style={styles.errorTitle}>Sinal perdido</Text>
-        <Pressable onPress={loadAll} style={styles.retryBtn}>
-          <Text style={styles.retryText}>TENTAR NOVAMENTE</Text>
+        <Text style={feedbackStyles.errorTitle}>Sinal perdido</Text>
+        <Pressable onPress={loadAll} style={feedbackStyles.retryBtn}>
+          <Text style={feedbackStyles.retryText}>TENTAR NOVAMENTE</Text>
         </Pressable>
       </View>
     );
@@ -461,7 +463,7 @@ export function UniverseScreen() {
   ];
 
   return (
-    <View style={styles.root}>
+    <View style={layoutStyles.root}>
       <FlatList
         data={listData}
         keyExtractor={(item, idx) =>
@@ -508,197 +510,3 @@ export function UniverseScreen() {
   );
 }
 
-// ─── Estilos ──────────────────────────────────────────────────────────────────
-
-const styles = StyleSheet.create({
-  root:    { flex: 1, backgroundColor: Colors.background },
-  centered:{ flex: 1, backgroundColor: Colors.background, alignItems: "center", justifyContent: "center", padding: 24 },
-
-  header:      { paddingHorizontal: 20, paddingTop: 60, paddingBottom: 16 },
-  headerLabel: { fontFamily: Fonts.orbitron, fontSize: 10, color: Colors.biluGreen, letterSpacing: 2.5, marginBottom: 6 },
-  headerTitle: { fontFamily: Fonts.orbitron, fontSize: 28, color: Colors.text, letterSpacing: 1, marginBottom: 4 },
-  headerSub:   { fontFamily: Fonts.spaceGrotesk, fontSize: 13, color: Colors.textSecondary },
-
-  solarCard: {
-    marginHorizontal: 16, marginBottom: 6,
-    borderRadius: 18, borderWidth: 1,
-    borderColor: Colors.cosmicBlue + "40",
-    backgroundColor: "rgba(14, 28, 54, 0.70)",
-    overflow: "hidden",
-  },
-  solarCardBg:      { ...StyleSheet.absoluteFillObject },
-  bgEmoji:          { position: "absolute" },
-  solarCardContent: { flexDirection: "row", alignItems: "center", padding: 16, gap: 14 },
-  solarCardLeft:    { alignItems: "center", gap: 6 },
-  solarIcon:        { fontSize: 28 },
-  solarBadge:       { backgroundColor: Colors.cosmicBlue + "20", borderWidth: 1, borderColor: Colors.cosmicBlue + "55", borderRadius: 100, paddingHorizontal: 8, paddingVertical: 2 },
-  solarBadgeText:   { fontFamily: Fonts.orbitron, fontSize: 8, color: Colors.cosmicBlue, letterSpacing: 1.5 },
-  solarCardBody:    { flex: 1, gap: 4 },
-  solarTitle:       { fontFamily: Fonts.orbitronBlack, fontSize: 16, color: Colors.text, letterSpacing: 0.5 },
-  solarSub:         { fontFamily: Fonts.spaceGrotesk, fontSize: 12, color: Colors.textSecondary, lineHeight: 18 },
-  solarArrowWrap:   { width: 32, height: 32, borderRadius: 10, backgroundColor: Colors.cosmicBlue + "15", borderWidth: 1, borderColor: Colors.cosmicBlue + "30", alignItems: "center", justifyContent: "center" },
-  solarGlowLine:    { height: 1, backgroundColor: Colors.cosmicBlue, opacity: 0.18 },
-
-  sectionDivider: { flexDirection: "row", alignItems: "center", gap: 8, marginHorizontal: 16, marginTop: 22, marginBottom: 10 },
-  dividerLine:    { flex: 1, height: 1, backgroundColor: "rgba(255,255,255,0.07)" },
-  dividerContent: { flexDirection: "row", alignItems: "center", gap: 6 },
-  dividerEmoji:   { fontSize: 13 },
-  dividerText:    { fontFamily: Fonts.orbitron, fontSize: 9, color: Colors.textSecondary, letterSpacing: 2 },
-  dividerCount:   { backgroundColor: "rgba(255,255,255,0.07)", borderRadius: 100, paddingHorizontal: 7, paddingVertical: 2 },
-  dividerCountText: { fontFamily: Fonts.orbitron, fontSize: 8, color: Colors.textSecondary, letterSpacing: 0.5 },
-
-  list: { paddingBottom: 32 },
-
-  card:     { flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: "rgba(30, 41, 59, 0.55)", borderRadius: 16, borderWidth: 1, padding: 14, marginBottom: 10, marginHorizontal: 16 },
-  emojiWrap:{ width: 52, height: 52, borderRadius: 26, borderWidth: 1, alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden" },
-  bodyImage:{ width: 52, height: 52, borderRadius: 26 },
-  emoji:    { fontSize: 26 },
-  cardBody: { flex: 1, gap: 6 },
-  cardTop:  { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8 },
-  bodyName: { fontFamily: Fonts.orbitronBlack, fontSize: 14, color: Colors.text, letterSpacing: 0.5, flex: 1 },
-  badge:    { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 100, borderWidth: 1 },
-  badgeText:{ fontFamily: Fonts.spaceGroteskBold, fontSize: 9, letterSpacing: 0.5 },
-
-  statRow:  { flexDirection: "row", justifyContent: "space-between" },
-  statLabel:{ fontFamily: Fonts.spaceGrotesk, fontSize: 11, color: Colors.textSecondary },
-  statValue:{ fontFamily: Fonts.spaceGroteskMedium, fontSize: 11 },
-  barTrack: { height: 3, backgroundColor: "rgba(255,255,255,0.08)", borderRadius: 2, overflow: "hidden" },
-  barFill:  { height: "100%", borderRadius: 2 },
-
-  loadingText: { fontFamily: Fonts.orbitron, color: Colors.textSecondary, fontSize: 10, letterSpacing: 2, marginTop: 14 },
-  errorTitle:  { fontFamily: Fonts.orbitron, color: Colors.text, fontSize: 16, marginBottom: 20 },
-  retryBtn:    { paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12, borderWidth: 1, borderColor: Colors.biluGreen + "66", backgroundColor: Colors.biluGreen + "15" },
-  retryText:   { fontFamily: Fonts.orbitron, color: Colors.biluGreen, fontSize: 11, letterSpacing: 1 },
-
-  bgPlanet: {
-  position: "absolute",
-  borderRadius: 999,
-},
-
-solarIconImage: {
-  width: 42,
-  height: 42,
-  borderRadius: 21,
-},
-
-solarIconWrap: {
-  width: 64,
-  height: 64,
-  borderRadius: 32,
-
-  justifyContent: "center",
-  alignItems: "center",
-
-  borderWidth: 1,
-  borderColor: "rgba(59,130,246,0.35)",
-
-  backgroundColor: "rgba(10,20,40,0.85)",
-
-  overflow: "hidden",
-
-  shadowColor: Colors.cosmicBlue,
-  shadowOpacity: 0.6,
-  shadowRadius: 15,
-  shadowOffset: {
-    width: 0,
-    height: 0,
-  },
-
-  elevation: 10,
-},
-sunCore: {
-  width: 18,
-  height: 18,
-  borderRadius: 9,
-
-  shadowColor: "#FFD54F",
-  shadowOpacity: 0.9,
-  shadowRadius: 12,
-  shadowOffset: {
-    width: 0,
-    height: 0,
-  },
-
-  elevation: 10,
-},
-
-orbit1: {
-  position: "absolute",
-  width: 30,
-  height: 30,
-  borderRadius: 15,
-  borderWidth: 1,
-  borderColor: "rgba(255,255,255,0.15)",
-  justifyContent: "flex-start",
-  alignItems: "center",
-},
-
-orbit2: {
-  position: "absolute",
-  width: 46,
-  height: 46,
-  borderRadius: 23,
-  borderWidth: 1,
-  borderColor: "rgba(255,255,255,0.10)",
-  justifyContent: "center",
-},
-
-planet1: {
-  width: 5,
-  height: 5,
-  borderRadius: 3,
-  backgroundColor: "#4FC3F7",
-  marginTop: -2,
-},
-
-planet2: {
-  position: "absolute",
-  width: 6,
-  height: 6,
-  borderRadius: 3,
-  backgroundColor: "#FF7043",
-  right: -3,
-  top: 20,
-},
-orbit3: {
-  position: "absolute",
-  width: 54,
-  height: 54,
-  borderRadius: 27,
-  borderWidth: 1,
-  borderColor: "rgba(255,255,255,0.08)",
-},
-
-planetBlue: {
-  position: "absolute",
-  top: -3,
-  left: "50%",
-  marginLeft: -3,
-
-  width: 6,
-  height: 6,
-  borderRadius: 3,
-
-  backgroundColor: "#4FC3F7",
-},
-
-planetRed: {
-  position: "absolute",
-  width: 6,
-  height: 6,
-  borderRadius: 3,
-  backgroundColor: "#FF7043",
-  right: -3,
-  top: 18,
-},
-
-planetGreen: {
-  position: "absolute",
-  width: 5,
-  height: 5,
-  borderRadius: 3,
-  backgroundColor: "#81C784",
-  left: -2,
-  bottom: 12,
-},},
-);

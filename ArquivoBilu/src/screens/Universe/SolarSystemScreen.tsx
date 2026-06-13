@@ -8,13 +8,13 @@ import {
   PanResponder,
   Platform,
   Pressable,
-  StyleSheet,
   Text,
   View,
 } from "react-native";
 import * as THREE from "three";
 
 import { Colors } from "../../theme/colors";
+import { solarSystemStyles as styles } from "./SolarSystemScreen.styles";
 import { Fonts } from "../../theme/fonts";
 import { useLoader } from "@react-three/fiber/native";
 import { TextureLoader } from "expo-three";
@@ -601,117 +601,3 @@ return (
   );
 }
 
-// ─── Estilos ──────────────────────────────────────────────────────────────────
-
-const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    backgroundColor: "#020617",
-  },
-  canvas: {
-    flex: 1,
-  },
-  header: {
-    position: "absolute",
-    top: Platform.OS === "ios" ? 56 : 40,
-    left: 20,
-  },
-  headerLabel: {
-    fontFamily: Fonts.orbitron,
-    fontSize: 10,
-    color: Colors.biluGreen,
-    letterSpacing: 2.5,
-    marginBottom: 4,
-  },
-  headerTitle: {
-    fontFamily: Fonts.orbitron,
-    fontSize: 22,
-    color: "#F8FAFC",
-    letterSpacing: 1,
-  },
-  hints: {
-    position: "absolute",
-    bottom: 100,
-    left: 0,
-    right: 0,
-    alignItems: "center",
-  },
-  hintText: {
-    fontFamily: Fonts.spaceGrotesk,
-    fontSize: 12,
-    color: "rgba(255,255,255,0.35)",
-    letterSpacing: 0.3,
-  },
-  pauseBtn: {
-    position: "absolute",
-    top: Platform.OS === "ios" ? 56 : 40,
-    right: 20,
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    backgroundColor: "rgba(2,6,23,0.7)",
-    borderWidth: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  tooltip: {
-    position: "absolute",
-    bottom: 110,
-    left: 16,
-    right: 16,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    backgroundColor: "rgba(15, 23, 42, 0.92)",
-    borderRadius: 18,
-    borderWidth: 1,
-    padding: 14,
-  },
-  tooltipEmoji: {
-    fontSize: 32,
-  },
-  tooltipImgWrap: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    borderWidth: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    overflow: "hidden",
-    flexShrink: 0,
-  },
-  tooltipImg: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-  },
-  tooltipName: {
-    fontFamily: Fonts.orbitron,
-    fontSize: 16,
-    letterSpacing: 0.5,
-  },
-  tooltipHint: {
-    fontFamily: Fonts.spaceGrotesk,
-    fontSize: 12,
-    color: Colors.textSecondary,
-    marginTop: 2,
-  },
-  tooltipBtn: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 10,
-    borderWidth: 1,
-  },
-  tooltipBtnText: {
-    fontFamily: Fonts.orbitron,
-    fontSize: 10,
-    letterSpacing: 1,
-  },
-  tooltipClose: {
-    padding: 4,
-  },
-});
-
-function setTexPlanet(createdTexture: THREE.Texture<unknown, THREE.TextureEventMap>) {
-  throw new Error("Function not implemented.");
-}

@@ -4,12 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Animated,
-  Dimensions,
   Image,
   Modal,
   Pressable,
   ScrollView,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
@@ -17,12 +15,11 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Colors } from "../../theme/colors";
+import { ufoDetailsStyles as styles } from "./UFODetailsScreen.styles";
 import { Fonts } from "../../theme/fonts";
 import { TYPE_INFO, type UFOCase } from "./ufoData";
 import { getUFOImages, type LocalImage } from "./ufoImages";
 
-const { width: SCREEN_W } = Dimensions.get("window");
-const IMG_SIZE = (SCREEN_W - 48) / 3 - 6;
 
 // ─── Thumbnail da galeria ─────────────────────────────────────────────────────
 
@@ -250,116 +247,3 @@ export function UFODetailsScreen({ route }: any) {
   );
 }
 
-// ─── Estilos ──────────────────────────────────────────────────────────────────
-
-const styles = StyleSheet.create({
-  root:   { flex: 1, backgroundColor: Colors.background },
-  scroll: { paddingHorizontal: 20, paddingBottom: 48 },
-
-  // Header
-  header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: 12 },
-  backBtn: {
-    width: 40, height: 40, borderRadius: 12,
-    backgroundColor: "rgba(255,255,255,0.07)",
-    borderWidth: 1, borderColor: "rgba(255,255,255,0.1)",
-    alignItems: "center", justifyContent: "center",
-  },
-  headerLabel: { fontFamily: Fonts.orbitron, fontSize: 10, color: Colors.textSecondary, letterSpacing: 2 },
-
-  // Hero
-  hero: { alignItems: "center", paddingVertical: 28, gap: 10 },
-  heroIcon: {
-    width: 100, height: 100, borderRadius: 28,
-    borderWidth: 1.5,
-    alignItems: "center", justifyContent: "center",
-    marginBottom: 4,
-  },
-  heroEmoji: { fontSize: 48 },
-  heroBadge: { paddingHorizontal: 14, paddingVertical: 5, borderRadius: 100, borderWidth: 1 },
-  heroBadgeText: { fontFamily: Fonts.orbitron, fontSize: 9, letterSpacing: 2 },
-  heroTitle: { fontFamily: Fonts.orbitron, fontSize: 22, color: Colors.text, letterSpacing: 0.5, textAlign: "center" },
-  heroMeta:  { fontFamily: Fonts.spaceGrotesk, fontSize: 13, color: Colors.textSecondary, textAlign: "center" },
-  witnessRow: {
-    flexDirection: "row", alignItems: "center", gap: 6,
-    backgroundColor: "rgba(255,255,255,0.05)",
-    paddingHorizontal: 14, paddingVertical: 6,
-    borderRadius: 20, borderWidth: 1, borderColor: "rgba(255,255,255,0.08)",
-  },
-  witnessEmoji: { fontSize: 14 },
-  witnessText:  { fontFamily: Fonts.spaceGroteskMedium, fontSize: 13, color: Colors.text },
-
-  // Seção
-  sectionTitle: { fontFamily: Fonts.orbitron, fontSize: 9, letterSpacing: 2.5, marginBottom: 10, marginTop: 20 },
-
-  // Descrição
-  descCard: {
-    backgroundColor: "rgba(15,23,42,0.9)",
-    borderRadius: 14, borderWidth: 1, borderLeftWidth: 3, padding: 16,
-  },
-  descText: { fontFamily: Fonts.spaceGrotesk, fontSize: 14, color: Colors.text, lineHeight: 24 },
-
-  // Galeria
-  gallery: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
-  thumb: {
-    width: IMG_SIZE,
-    height: IMG_SIZE,
-    borderRadius: 10,
-    borderWidth: 1,
-    overflow: "hidden",
-    backgroundColor: "rgba(30,41,59,0.8)",
-  },
-  thumbPlaceholder: {
-    ...StyleSheet.absoluteFillObject,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "rgba(30,41,59,0.8)",
-  },
-  thumbImg: { width: "100%", height: "100%" },
-  galleryLoading: { alignItems: "center", paddingVertical: 24, gap: 10 },
-  galleryLoadingText: { fontFamily: Fonts.orbitron, fontSize: 9, letterSpacing: 1.5 },
-  galleryEmpty:  { paddingVertical: 20 },
-  galleryEmptyText: { fontFamily: Fonts.spaceGrotesk, fontSize: 12, color: Colors.textSecondary },
-  galleryCredit: {
-    fontFamily: Fonts.spaceGrotesk, fontSize: 10,
-    color: Colors.textSecondary, opacity: 0.5,
-    marginTop: 8, textAlign: "right",
-  },
-
-  // Modal
-  modalOverlay: {
-    flex: 1, backgroundColor: "rgba(0,0,0,0.88)",
-    alignItems: "center", justifyContent: "center",
-    padding: 20,
-  },
-  modalCard: {
-    width: "100%", borderRadius: 20,
-    backgroundColor: Colors.surface,
-    borderWidth: 1, borderColor: "rgba(255,255,255,0.1)",
-    overflow: "hidden",
-  },
-  modalClose: {
-    position: "absolute", top: 12, right: 12, zIndex: 10,
-    width: 36, height: 36, borderRadius: 10,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    alignItems: "center", justifyContent: "center",
-  },
-  modalImg: { width: "100%", height: 260 },
-  modalInfo: { padding: 16, gap: 6 },
-  modalTitle: { fontFamily: Fonts.spaceGroteskBold, fontSize: 14, lineHeight: 20 },
-  modalDate:  { fontFamily: Fonts.orbitron, fontSize: 9, color: Colors.textSecondary, letterSpacing: 1 },
-  modalDesc:  { fontFamily: Fonts.spaceGrotesk, fontSize: 12, color: Colors.textSecondary, lineHeight: 18 },
-
-  // Evidências
-  evidenceCard: {
-    backgroundColor: "rgba(15,23,42,0.9)",
-    borderRadius: 14, borderWidth: 1, overflow: "hidden",
-  },
-  evidenceRow: { flexDirection: "row", alignItems: "flex-start", gap: 12, padding: 14 },
-  evidenceDot: { width: 6, height: 6, borderRadius: 3, marginTop: 6, flexShrink: 0 },
-  evidenceText: { flex: 1, fontFamily: Fonts.spaceGrotesk, fontSize: 13, color: Colors.text, lineHeight: 20 },
-
-  // Rodapé
-  footer: { alignItems: "center", gap: 6, paddingTop: 32 },
-  footerEmoji: { fontSize: 24 },
-  footerText: { fontFamily: Fonts.orbitron, fontSize: 8, color: Colors.textSecondary, letterSpacing: 1.5, opacity: 0.5 },
-});
