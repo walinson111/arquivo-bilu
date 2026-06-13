@@ -83,7 +83,7 @@ npm install
 ### 4. Inicie o projeto
 
 ```bash
-npx expo start
+npm start
 ```
 
 ### 5. Execute no dispositivo
