@@ -10,14 +10,13 @@ export type FavoriteItem = {
   emoji: string;
   accent: string;
   subtitle?: string;
-  savedAt: number; // timestamp
+  savedAt: number; 
 };
 
 export function useFavorites() {
   const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
   const [loaded, setLoaded] = useState(false);
 
-  // Carrega do storage na montagem
   useEffect(() => {
     AsyncStorage.getItem(STORAGE_KEY)
       .then((raw) => {
@@ -27,7 +26,6 @@ export function useFavorites() {
       .finally(() => setLoaded(true));
   }, []);
 
-  // Persiste sempre que muda
   useEffect(() => {
     if (!loaded) return;
     AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(favorites)).catch(() => {});

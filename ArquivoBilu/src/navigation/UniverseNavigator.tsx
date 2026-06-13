@@ -10,7 +10,6 @@ import { UniverseScreen } from "../screens/Universe/UniverseScreen";
 import { PlanetComparisonScreen } from "../screens/Universe/PlanetComparisonScreen";
 import type { UniverseStackParamList } from "./types";
 
-// Re-exporta para compatibilidade com arquivos que já importam daqui
 export type { UniverseStackParamList };
 
 const Stack = createNativeStackNavigator<UniverseStackParamList>();

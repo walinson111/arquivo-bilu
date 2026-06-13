@@ -36,7 +36,6 @@ function TabNavigator() {
 export function AppNavigator() {
   const { state } = useAuth();
 
-  // Splash enquanto verifica sessão salva
   if (state.status === "loading") {
     return (
       <View style={{ flex: 1, backgroundColor: Colors.background, alignItems: "center", justifyContent: "center" }}>
@@ -45,12 +44,10 @@ export function AppNavigator() {
     );
   }
 
-  // Não autenticado → fluxo de login/cadastro
   if (state.status === "unauthenticated") {
     return <AuthNavigator />;
   }
 
-  // Autenticado → app completo
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Tabs" component={TabNavigator} />

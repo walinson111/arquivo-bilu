@@ -1,5 +1,3 @@
-// ─── Dados estáticos do Sistema Solar + Estrelas ─────────────────────────────
-// Dados baseados em fontes da NASA / IAU / SIMBAD.
 
 export interface CelestialBody {
   id: string;
@@ -18,19 +16,19 @@ export interface Star {
   id: string;
   name: string;
   constellation: string;
-  spectralType: string;         // Ex: "G2V", "M2Ia"
-  starClass: string;            // Ex: "Anã Amarela", "Supergigante"
-  distanceLy: number;           // Distância em anos-luz
-  luminosity: number;           // Luminosidade relativa ao Sol (Sol = 1)
-  mass: number;                 // Massa relativa ao Sol (Sol = 1)
-  radius: number;               // Raio relativo ao Sol (Sol = 1)
-  surfaceTemp: number;          // Temperatura superficial em Kelvin
-  absoluteMag: number;          // Magnitude absoluta
-  age: number | null;           // Idade em bilhões de anos
+  spectralType: string;         
+  starClass: string;            
+  distanceLy: number;           
+  luminosity: number;           
+  mass: number;                 
+  radius: number;               
+  surfaceTemp: number;          
+  absoluteMag: number;          
+  age: number | null;           
   emoji: string;
   accent: string;
   description: string;
-  curiosity: string;            // Fato curioso
+  curiosity: string;            
 }
 
 // ─── Planetas ─────────────────────────────────────────────────────────────────
