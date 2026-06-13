@@ -4,10 +4,12 @@ import {
   Animated,
   Dimensions,
   Image,
+  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
@@ -47,6 +49,65 @@ function StarField() {
     <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
       {stars.map(s => <BlinkingStar key={s.id} x={s.x} y={s.y} size={s.size} delay={s.delay} />)}
     </View>
+  );
+}
+
+// ─── Modal de zoom da imagem APOD ────────────────────────────────────────────
+
+function ApodImageModal({
+  visible,
+  uri,
+  title,
+  onClose,
+}: {
+  visible: boolean;
+  uri: string;
+  title: string;
+  onClose: () => void;
+}) {
+  const scaleAnim  = useRef(new Animated.Value(0.92)).current;
+  const opacityAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (visible) {
+      Animated.parallel([
+        Animated.spring(scaleAnim,   { toValue: 1,    useNativeDriver: true, tension: 80, friction: 8 }),
+        Animated.timing(opacityAnim, { toValue: 1, duration: 220, useNativeDriver: true }),
+      ]).start();
+    } else {
+      scaleAnim.setValue(0.92);
+      opacityAnim.setValue(0);
+    }
+  }, [visible]);
+
+  return (
+    <Modal visible={visible} transparent animationType="none" onRequestClose={onClose} statusBarTranslucent>
+      {/* Overlay — fechar ao tocar fora */}
+      <Pressable style={styles.modalOverlay} onPress={onClose}>
+        <Animated.View style={[styles.modalCard, { opacity: opacityAnim, transform: [{ scale: scaleAnim }] }]}>
+          {/* Impede que toque na imagem feche o modal */}
+          <Pressable>
+            {/* Botão fechar */}
+            <TouchableOpacity onPress={onClose} style={styles.modalCloseBtn} activeOpacity={0.8}>
+              <Text style={styles.modalCloseText}>✕</Text>
+            </TouchableOpacity>
+
+            {/* Imagem em tamanho cheio */}
+            <Image
+              source={{ uri }}
+              style={styles.modalImage}
+              resizeMode="contain"
+            />
+
+            {/* Título e crédito */}
+            <View style={styles.modalInfo}>
+              <Text style={styles.modalTitle} numberOfLines={2}>{title}</Text>
+              <Text style={styles.modalCredit}>NASA · Foto Astronômica do Dia</Text>
+            </View>
+          </Pressable>
+        </Animated.View>
+      </Pressable>
+    </Modal>
   );
 }
 
@@ -104,6 +165,7 @@ export function HomeScreen() {
   const [loading,      setLoading]      = useState(true);
   const [error,        setError]        = useState("");
   const [apodExpanded, setApodExpanded] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
   const insets   = useSafeAreaInsets();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim= useRef(new Animated.Value(20)).current;
@@ -182,14 +244,24 @@ export function HomeScreen() {
           <View style={[styles.apodCard, { borderColor: Colors.cosmicBlue + "33" }]}>
             <View style={styles.apodImgWrap}>
               {!isVideo ? (
-                <Image source={{ uri: apod?.url }} style={styles.apodImg} resizeMode="cover" />
+                // Toque na imagem abre o modal de zoom
+                <Pressable
+                  onPress={() => setModalVisible(true)}
+                  style={({ pressed }) => [{ flex: 1, opacity: pressed ? 0.9 : 1 }]}
+                >
+                  <Image source={{ uri: apod?.url }} style={styles.apodImg} resizeMode="cover" />
+                  {/* Ícone de lupa — indica que a imagem é clicável */}
+                  <View style={styles.apodZoomHint}>
+                    <Text style={styles.apodZoomIcon}>🔍</Text>
+                  </View>
+                </Pressable>
               ) : (
                 <View style={styles.apodVideoPlaceholder}>
                   <Text style={{ fontSize: 40 }}>🎬</Text>
                   <Text style={styles.apodVideoText}>Vídeo NASA disponível</Text>
                 </View>
               )}
-              <LinearGradient colors={["transparent", "rgba(2,6,23,0.6)", "rgba(2,6,23,0.97)"]} style={StyleSheet.absoluteFillObject} locations={[0.2, 0.6, 1]} />
+              <LinearGradient colors={["transparent", "rgba(2,6,23,0.6)", "rgba(2,6,23,0.97)"]} style={StyleSheet.absoluteFillObject} locations={[0.2, 0.6, 1]} pointerEvents="none" />
               <View style={styles.apodBadge}>
                 <View style={styles.apodBadgeDot} />
                 <Text style={styles.apodBadgeText}>FOTO ASTRONÔMICA DO DIA</Text>
@@ -257,7 +329,16 @@ export function HomeScreen() {
         </View>
 
       </Animated.ScrollView>
+
+      {/* Modal de zoom da APOD */}
+      {apod && !isVideo && (
+        <ApodImageModal
+          visible={modalVisible}
+          uri={apod.url}
+          title={apod.title}
+          onClose={() => setModalVisible(false)}
+        />
+      )}
     </View>
   );
 }
-

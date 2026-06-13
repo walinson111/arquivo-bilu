@@ -439,4 +439,89 @@ export const homeStyles = StyleSheet.create({
     backgroundColor: Colors.biluGreen,
     opacity: 0.15,
   },
+
+
+  // ─── Hint de zoom na imagem APOD ─────────────────────────────────────────────
+
+  /** Indicador de lupa no canto da imagem sinalizando que é clicável. */
+  apodZoomHint: {
+    position: "absolute",
+    bottom: 48,
+    right: 12,
+    backgroundColor: "rgba(2,6,23,0.55)",
+    borderRadius: 20,
+    padding: 6,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.15)",
+  },
+  apodZoomIcon: {
+    fontSize: 14,
+  },
+
+  // ─── Modal de zoom da imagem APOD ────────────────────────────────────────────
+
+  /** Overlay escuro que cobre a tela ao abrir o modal. Fechar ao tocar. */
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.92)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 16,
+  },
+
+  /** Card com animação de escala ao abrir. */
+  modalCard: {
+    width: "100%",
+    borderRadius: 20,
+    backgroundColor: "rgba(10,18,35,0.98)",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.1)",
+    overflow: "hidden",
+  },
+
+  /** Botão "✕" no canto superior direito do modal. */
+  modalCloseBtn: {
+    position: "absolute",
+    top: 12,
+    right: 12,
+    zIndex: 10,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.15)",
+  },
+  modalCloseText: {
+    color: "#fff",
+    fontSize: 13,
+    lineHeight: 18,
+  },
+
+  /** Imagem em tamanho completo dentro do modal. */
+  modalImage: {
+    width: "100%",
+    height: 320,
+  },
+
+  /** Área com título e crédito abaixo da imagem. */
+  modalInfo: {
+    padding: 16,
+    gap: 6,
+  },
+  modalTitle: {
+    fontFamily: "Orbitron_700Bold",
+    fontSize: 13,
+    color: "#F8FAFC",
+    letterSpacing: 0.3,
+    lineHeight: 20,
+  },
+  modalCredit: {
+    fontFamily: "SpaceGrotesk_400Regular",
+    fontSize: 11,
+    color: "#94A3B8",
+    letterSpacing: 0.5,
+  },
 });
