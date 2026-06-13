@@ -125,7 +125,6 @@ Algumas melhorias planejadas para versões futuras:
 * Sistema de busca por objetos astronômicos;
 * Melhorias de desempenho e experiência do usuário;
 * Expansão do conteúdo educativo sobre astronomia;
-* Disponibilização do aplicativo na Play Store.
 
 ## Objetivo do projeto
 
