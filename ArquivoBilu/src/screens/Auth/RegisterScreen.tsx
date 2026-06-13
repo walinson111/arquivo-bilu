@@ -93,7 +93,7 @@ export function RegisterScreen({ onGoLogin }: Props) {
                 onChangeText={setPassword}
               />
               <Pressable onPress={() => setShowPass(v => !v)} style={formStyles.eyeBtn}>
-                <Text style={formStyles.eyeIcon}>{showPass ? "🙈" : "👁️"}</Text>
+                <Text style={formStyles.eyeIcon}>{showPass ? "Ocultar" : "Mostrar"}</Text>
               </Pressable>
             </View>
           </View>
